@@ -1,6 +1,151 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     /* ============================================================
+       SHARED CHAPTER SIDEBAR (desktop: always open)
+       Edit the CHAPTERS list below to add / rename chapters & topics.
+       - id        : must match <body data-chapter="ID"> of that page
+       - topics    : data-content ids used by that page's own JS
+       - children  : sub-topics (shown indented under a topic)
+       Pages need: <body class="has-chapter-nav" data-chapter="ID"> and
+                   <aside class="chapter-sidebar" id="chapterSidebar"></aside>
+    ============================================================ */
+    (function () {
+        var CHAPTERS = [
+            { id: 'preface',  label: 'Preface', href: 'Preface.html' },
+
+            { id: 'chapter1', label: '2. Need and scope', href: 'chapter1.html',
+              topics: [
+                  { id: 'intro',       label: 'The Need and scope' },
+                  { id: 'not-covered', label: 'What is not covered' },
+                  { id: 'covered',     label: 'What is covered' }
+              ] },
+
+            { id: 'chapter2', label: '3. How to use the manual', href: 'chapter2.html' },
+
+            { id: 'chapter3', label: '4. Engaging the architect', href: 'chapter3.html',
+              topics: [
+                  { id: 'intro', label: 'A. Introduction' },
+                  { id: 'approval-process', label: 'B. Five Stage Process Integrated',
+                    children: [
+                        { id: 'preliminary-design', label: '1. Preliminary Design Submission' },
+                        { id: 'concept-design',     label: '2. Concept Design Submission' },
+                        { id: 'statutory-approval', label: '3. Statutory Approval Submission' }
+                    ] },
+                  { id: 'flowchart', label: 'C. Flow Chart' }
+              ] },
+
+            { id: 'chapter4', label: '5. High-level considerations', href: 'chapter4.html',
+              topics: [
+                  { id: 'intro',                  label: 'Introduction' },
+                  { id: 'functional-adequacy',    label: 'A) Functional adequacy' },
+                  { id: 'operational-efficiency', label: 'B) Operational efficiency' },
+                  { id: 'resources',              label: 'List of resources' }
+              ] },
+
+            { id: 'chapter6a', label: '6a. Outpatient care', href: 'chapter6a.html',
+              topics: [
+                  { id: 'intro', label: 'Introduction' },
+                  { id: 'factors-influencing', label: 'A) Factors influencing space',
+                    children: [
+                        { id: 'service-levels',      label: '1. Service levels of care' },
+                        { id: 'layout-design',       label: '2. Layout design' },
+                        { id: 'investigation-area',  label: '3. Investigation & procedure area' }
+                    ] },
+                  { id: 'preferred-practices', label: 'B) Preferred practices' },
+                  { id: 'resources',           label: 'List of resources' }
+              ] },
+
+            { id: 'chapter6b', label: '6b. Operation theatre complex', href: 'chapter6b.html',
+              topics: [
+                  { id: 'intro',                label: 'A. Introduction' },
+                  { id: 'planning',             label: 'B. Planning for an OT Complex' },
+                  { id: 'layout-considerations',label: 'C. Key Layout Design Considerations (1-3)' },
+                  { id: 'design-elements',      label: 'C. Key Layout Design Considerations (4-6)' },
+                  { id: 'preferred-practices',  label: 'D. Preferred Practices' },
+                  { id: 'resources',            label: 'List of Resources' }
+              ] },
+
+            { id: 'chapter6c', label: '6c. Ambulatory and inpatient care', href: 'chapter6c.html',
+              topics: [
+                  { id: 'intro',                 label: 'Introduction' },
+                  { id: 'design-considerations', label: 'A) Ambulatory/inpatient care unit: design considerations' },
+                  { id: 'safety-considerations', label: 'B) Key considerations to ensure safe stay' },
+                  { id: 'resources',             label: 'List of resources' }
+              ] },
+
+            { id: 'chapter7', label: '7. Patient and staff safety', href: 'chapter7.html',
+              topics: [
+                  { id: 'intro',                 label: 'A) Introduction' },
+                  { id: 'safety-building-design',label: 'B) Safety considerations in building design' },
+                  { id: 'safety-routine-work',   label: 'C) Safety considerations in routine work' },
+                  { id: 'good-building-design',  label: 'D) Good building design' },
+                  { id: 'references',            label: 'E) References' },
+                  { id: 'resources',             label: 'F) List of Resources' }
+              ] },
+
+            { id: 'chapter8', label: '8. Energy efficient sustainable hospital infrastructure', href: 'chapter8.html',
+              topics: [
+                  { id: 'intro',       label: 'Introduction' },
+                  { id: 'procurement', label: '1. Procurement' },
+                  { id: 'design',      label: '2. Design' },
+                  { id: 'equipment',   label: '3. Equipment' },
+                  { id: 'operations',  label: '4. Operations and Maintenance' },
+                  { id: 'culture',     label: '5. Fostering a Culture of Sustainable Practices' }
+              ] }
+        ];
+
+        var sidebar = document.getElementById('chapterSidebar');
+        if (!sidebar) return;
+
+        var current = document.body.getAttribute('data-chapter');
+
+        function esc(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        var html = '' +
+            '<div class="sidebar-header">' +
+                '<div class="close-btn sidebar-close-btn" id="sidebarCloseBtn"><i class="fas fa-times"></i></div>' +
+                '<h3>Contents</h3>' +
+            '</div>' +
+            '<nav class="sidebar-nav"><ul class="nav-list">' +
+            '<li class="nav-item chapter-item"><a class="nav-link chapter-link" href="index.html">' +
+            '<span><i class="fas fa-home" style="margin-right:8px;"></i>Home</span></a></li>';
+
+        CHAPTERS.forEach(function (ch) {
+            var isActive = ch.id === current;
+            html += '<li class="nav-item chapter-item' + (isActive ? ' is-current' : '') + '">';
+            html += '<a class="nav-link chapter-link' + (isActive ? ' active' : '') + '" href="' + esc(ch.href) + '">' +
+                    '<span>' + esc(ch.label) + '</span></a>';
+
+            // Topics are shown only under the chapter you are reading.
+            if (isActive && ch.topics && ch.topics.length) {
+                html += '<ul class="chapter-topics">';
+                ch.topics.forEach(function (t) {
+                    html += '<li><div class="nav-link parent-link topic-link" data-content="' + esc(t.id) + '">' +
+                            '<span>' + esc(t.label) + '</span></div>';
+                    if (t.children && t.children.length) {
+                        html += '<ul class="chapter-subtopics">';
+                        t.children.forEach(function (c) {
+                            html += '<li><div class="nav-link subsection-link" data-content="' + esc(c.id) + '">' +
+                                    '<span>' + esc(c.label) + '</span></div></li>';
+                        });
+                        html += '</ul>';
+                    }
+                    html += '</li>';
+                });
+                html += '</ul>';
+            }
+            html += '</li>';
+        });
+
+        html += '</ul></nav>';
+        sidebar.innerHTML = html;
+    })();
+
+
+
+    /* ============================================================
        MOBILE DESKTOP-VIEW NOTICE
        Shows a dismissible top banner on every page load for
        mobile users — exactly like the warning bar style.
@@ -2096,7 +2241,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (nextBtn) {
                 nextBtn.addEventListener('click', function() {
                     if (currentContentIndex === contentOrder.length - 1) {
-                        window.location.href = 'chapter9.html';
+                        window.location.href = 'index.html';
                     } else {
                         const newIndex = currentContentIndex + 1;
                         const contentId = contentOrder[newIndex];
@@ -2115,7 +2260,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (nextBtn) {
                 nextBtn.style.display = 'flex';
                 if (currentContentIndex === contentOrder.length - 1) {
-                    nextBtn.innerHTML = '<span>Next Chapter</span><i class="fas fa-chevron-right"></i>';
+                    nextBtn.innerHTML = '<i class="fas fa-home"></i><span>Home</span>';
                 } else {
                     nextBtn.innerHTML = '<span>Next</span><i class="fas fa-chevron-right"></i>';
                 }
@@ -2182,9 +2327,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (nextBtn) {
-                nextBtn.innerHTML = '<span>Next Chapter</span><i class="fas fa-chevron-right"></i>';
+                nextBtn.innerHTML = '<i class="fas fa-home"></i><span>Home</span>';
                 nextBtn.addEventListener('click', function() {
-                    window.location.href = 'chapter9.html';
+                    window.location.href = 'index.html';
                 });
             }
         }

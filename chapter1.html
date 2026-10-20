@@ -8,7 +8,7 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="chapter-page">
+<body class="chapter-page has-chapter-nav" data-chapter="chapter1">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -42,37 +42,7 @@
     </button>
 
     <div class="chapter-container">
-        <aside class="chapter-sidebar" id="chapterSidebar">
-            <div class="sidebar-header">
-                <div class="close-btn sidebar-close-btn" id="sidebarCloseBtn">
-                    <i class="fas fa-times"></i>
-                </div>
-                <h3>The Need and Scope</h3>
-            </div>
-            
-            
-            <nav class="sidebar-nav">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <div class="nav-link parent-link active" data-content="intro">
-                            <span>The Need and scope</span>
-                        </div>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <div class="nav-link parent-link" data-content="not-covered">
-                            <span>What is not covered</span>
-                        </div>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <div class="nav-link parent-link" data-content="covered">
-                            <span>What is covered</span>
-                        </div>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        <aside class="chapter-sidebar" id="chapterSidebar"></aside>
         
 
         <main class="chapter-content">
@@ -92,12 +62,8 @@
                             <span class="breadcrumb-link breadcrumb-primary active">The Need and Scope</span>
                         </div>
                     </div>
-
-                    <!-- 50th Logo OUTSIDE breadcrumb box -->
-                    <div class="chapter-logo-container">
-                        <img src="50 th_Final_Logo_2025_Black.png" alt="Aravind Eye Care Logo" class="chapter-logo">
                     </div>
-                </div>
+                 
 
                 <article class="main-article">
                     <div class="content-block" id="content-intro">
@@ -163,6 +129,6 @@
     </div>
     
 
-    <script src="scripit.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="has-chapter-nav" data-chapter="chapter6a">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -42,67 +42,7 @@
     </button>
 
     <div class="chapter-container">
-        <aside class="chapter-sidebar" id="chapterSidebar">
-            <div class="sidebar-header">
-                <div class="close-btn sidebar-close-btn" id="sidebarCloseBtn">
-                    <i class="fas fa-times"></i>
-                </div>
-                <h3>Outpatient Care</h3>
-            </div>
-            
-            <nav class="sidebar-nav">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <div class="nav-link parent-link active" data-content="intro">
-                            <i class="far fa-circle"></i>
-                            <span>Introduction</span>
-                        </div>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <div class="nav-link parent-link" data-content="factors-influencing">
-                            <i class="far fa-circle"></i>
-                            <span>A) Factors influencing space</span>
-                            <i class="fas fa-chevron-down dropdown-icon"></i>
-                        </div>
-                        <ul class="nav-sublist-level2">
-                            <li class="nav-subitem-level2">
-                                <div class="nav-link subsection-link" data-content="service-levels">
-                                    <i class="far fa-dot-circle"></i>
-                                    <span>1. Service levels of care</span>
-                                </div>
-                            </li>
-                            <li class="nav-subitem-level2">
-                                <div class="nav-link subsection-link" data-content="layout-design">
-                                    <i class="far fa-dot-circle"></i>
-                                    <span>2. Layout design</span>
-                                </div>
-                            </li>
-                            <li class="nav-subitem-level2">
-                                <div class="nav-link subsection-link" data-content="investigation-area">
-                                    <i class="far fa-dot-circle"></i>
-                                    <span>3. Investigation & procedure area</span>
-                                </div>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <div class="nav-link parent-link" data-content="preferred-practices">
-                            <i class="far fa-circle"></i>
-                            <span>B) Preferred practices</span>
-                        </div>
-                    </li>
-
-                    <li class="nav-item">
-                        <div class="nav-link parent-link" data-content="resources">
-                            <i class="far fa-circle"></i>
-                            <span>List of resources</span>
-                        </div>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        <aside class="chapter-sidebar" id="chapterSidebar"></aside>
 
         <main class="chapter-content">
             <div class="content-wrapper">
@@ -110,9 +50,7 @@
                     <div class="breadcrumb" id="breadcrumbNav">
                     </div>
                     <!-- 50th Logo OUTSIDE breadcrumb box -->
-                    <div class="chapter-logo-container">
-                        <img src="50 th_Final_Logo_2025_Black.png" alt="Aravind Eye Care Logo" class="chapter-logo">
-                    </div>
+                   
                 </div>
 
                 <article class="main-article">
@@ -185,7 +123,7 @@
                         <h3 style="color: #c9a961; margin-top: 30px; margin-bottom: 15px;">The general patient flow in an outpatient clinic would be as follows:</h3>
                         
                         <div style="margin: 30px 0; text-align: center;">
-                            <img src="Chapter-5/Section 6A/Picture2.jpg" 
+                            <img src="Chapter-6a\Picture2.jpg" 
                                  alt="Patient Flow Diagrams" 
                                  onclick="openImageModal(this.src, 'Patient Flow Diagrams')"
                                  style="max-width: 100%; height: auto; cursor: pointer; border: 2px solid #e0e0e0; border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
@@ -199,7 +137,7 @@
 
                         <!-- Treatment Distribution Chart - Clickable Image -->
                         <div style="margin: 30px 0; text-align: center;">
-                            <img src="Chapter-5\Section 6A\Picture3.jpg" 
+                            <img src="Chapter-6a\Picture4.jpg" 
                                  alt="Treatment Distribution Chart" 
                                  onclick="openImageModal(this.src, 'Treatment Distribution Chart')"
                                  style="max-width: 100%; height: auto; cursor: pointer; border: 2px solid #e0e0e0; border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
@@ -216,10 +154,10 @@
                                     Checklist 1 – List of services and investigations
                                 </h4>
                                 <div class="resource-buttons">
-                                    <button onclick="openFileViewer('1 - OPD - List of Services and Investigations_for HTML.pdf', 'pdf')" class="btn-resource">
+                                    <button onclick="openFileViewer('Chapter-6a/1 - OPD - List of Services and Investigations_for HTML.pdf', 'pdf')" class="btn-resource">
                                         <i class="fas fa-eye"></i> Click to view pdf
                                     </button>
-                                    <a href="1 - OPD - List of Services and Investigations_for HTML.xlsx" download class="btn-resource">
+                                    <a href="Chapter-6a/1 - OPD - List of Services and Investigations_for HTML.xlsx" download class="btn-resource">
                                         <i class="fas fa-download"></i> Click to download excel
                                     </a>
                                 </div>
@@ -230,10 +168,10 @@
                                     Checklist 2 – Equipment and furniture requirements
                                 </h4>
                                 <div class="resource-buttons">
-                                    <button onclick="openFileViewer('2 - OPD - Checklist for Equipment & Furniture Requirements_for HTML.pdf', 'pdf')" class="btn-resource">
+                                    <button onclick="openFileViewer('Chapter-6a/2 - OPD - Checklist for Equipment & Furniture Requirements_for HTML.pdf', 'pdf')" class="btn-resource">
                                         <i class="fas fa-eye"></i> Click to view pdf 
                                     </button>
-                                    <a href="2 - OPD - Checklist for Equipment & Furniture Requirements_for HTML.xlsx" download class="btn-resource">
+                                    <a href="Chapter-6a/2 - OPD - Checklist for Equipment & Furniture Requirements_for HTML.xlsx" download class="btn-resource">
                                         <i class="fas fa-download"></i> Click to download excel
                                     </a>
                                 </div>
@@ -277,7 +215,7 @@
                                     <div style="margin-bottom: 20px;">
                                         <p style="margin-bottom: 10px; font-weight: 600;">Consultation room 1</p>
                                         <div class="resource-buttons">
-                                            <button onclick="openFileViewer('1a - Consultation Room.pdf', 'pdf')" class="btn-resource">
+                                            <button onclick="openFileViewer('Chapter-6a/1a - Consultation Room.pdf', 'pdf')" class="btn-resource">
                                                 <i class="fas fa-eye"></i> Click to view pdf
                                             </button>
                                         </div>
@@ -286,7 +224,7 @@
                                     <div style="margin-bottom: 20px;">
                                         <p style="margin-bottom: 10px; font-weight: 600;">Consultation room – different settings</p>
                                         <div class="resource-buttons">
-                                            <button onclick="openFileViewer('1b - Consultation Room - Different Settings.pdf', 'pdf')" class="btn-resource">
+                                            <button onclick="openFileViewer('Chapter-6a/1b - Consultation Room - Different Settings.pdf', 'pdf')" class="btn-resource">
                                                 <i class="fas fa-eye"></i> Click to view pdf
                                             </button>
                                         </div>
@@ -295,7 +233,7 @@
                                     <div style="margin-bottom: 20px;">
                                         <p style="margin-bottom: 10px; font-weight: 600;">Consultation room 2 (Paediatric)</p>
                                         <div class="resource-buttons">
-                                            <button onclick="openFileViewer('2 - Paediatric examination room.pdf', 'pdf')" class="btn-resource">
+                                            <button onclick="openFileViewer('Chapter-6a/2 - Paediatric examination room.pdf', 'pdf')" class="btn-resource">
                                                 <i class="fas fa-eye"></i> Click to view pdf
                                             </button>
                                         </div>
@@ -304,7 +242,7 @@
                                     <div style="margin-bottom: 20px;">
                                         <p style="margin-bottom: 10px; font-weight: 600;">Consultation room – 3D Rendition</p>
                                         <div class="resource-buttons">
-                                            <button onclick="openFileViewer('1d - Consultation Room - 3D Rendition.pdf', 'pdf')" class="btn-resource">
+                                            <button onclick="openFileViewer('Chapter-6a/3d - Consultation Room - 3D Rendition.pdf', 'pdf')" class="btn-resource">
                                                 <i class="fas fa-eye"></i> Click to View pdf
                                             </button>
                                         </div>
@@ -317,7 +255,7 @@
                                     Layout 2 – Layout design of an outpatient clinic (Multi-station workflow model)
                                 </h4>
                                 <div class="resource-buttons" style="margin-left: 20px;">
-                                    <button onclick="openFileViewer('3 - OPD - Multi-station workflow of a secondary eye hospital.pdf', 'pdf')" class="btn-resource">
+                                    <button onclick="openFileViewer('Chapter-6a/3 - OPD - Multi-station workflow of a secondary eye hospital.pdf', 'pdf')" class="btn-resource">
                                         <i class="fas fa-eye"></i> Click to view pdf
                                     </button>
                                 </div>
@@ -353,7 +291,7 @@
                                     Layout 3: Refraction lane
                                 </h4>
                                 <div class="resource-buttons" style="margin-left: 20px;">
-                                    <button onclick="openFileViewer('4 - Refraction Unit.pdf', 'pdf')" class="btn-resource">
+                                    <button onclick="openFileViewer('Chapter-6a/4 - Refraction Unit.pdf', 'pdf')" class="btn-resource">
                                         <i class="fas fa-eye"></i> Click to view pdf
                                     </button>
                                 </div>
@@ -364,7 +302,7 @@
                                     Layout 4: Investigation room – basic needs
                                 </h4>
                                 <div class="resource-buttons" style="margin-left: 20px;">
-                                    <button onclick="openFileViewer('5 - Investigation Room - Basic Need.pdf', 'pdf')" class="btn-resource">
+                                    <button onclick="openFileViewer('Chapter-6a/5 - Investigation Room - Basic Need.pdf', 'pdf')" class="btn-resource">
                                         <i class="fas fa-eye"></i> Click to view pdf
                                     </button>
                                 </div>
@@ -376,7 +314,7 @@
                                 </h4>
                                 <p style="margin-left: 20px; margin-bottom: 10px; color: #666; font-size: 0.95em;">This can be used as a refraction room or for other investigations</p>
                                 <div class="resource-buttons" style="margin-left: 20px;">
-                                    <button onclick="openFileViewer('6 - Investigation Room - Comprehensive Module.pdf', 'pdf')" class="btn-resource">
+                                    <button onclick="openFileViewer('Chapter-6a/6 - Investigation Room - Comprehensive Module.pdf', 'pdf')" class="btn-resource">
                                         <i class="fas fa-eye"></i> Click to view pdf
                                     </button>
                                 </div>
@@ -387,7 +325,7 @@
                                     Layout 6: A typical scan room
                                 </h4>
                                 <div class="resource-buttons" style="margin-left: 20px;">
-                                    <button onclick="openFileViewer('6 - Multipurpose Scan room.pdf', 'pdf')" class="btn-resource">
+                                    <button onclick="openFileViewer('Chapter-6a/6 - Multipurpose Scan room.pdf', 'pdf')" class="btn-resource">
                                         <i class="fas fa-eye"></i> Click to view pdf
                                     </button>
                                 </div>
@@ -411,7 +349,7 @@
                                 
                                 <div style="flex: 0 0 auto; min-width: 250px; text-align: center;">
                                     <!-- Grid Model Diagram - Clickable Image -->
-                                    <img src="Chapter-5\Section 6A\Picture4.jpg" 
+                                    <img src="Chapter-6a\Picture4.jpg" 
                                          alt="Grid Model Diagram" 
                                          onclick="openImageModal(this.src, 'Grid Model Diagram - Standardized Room Sizes')"
                                          style="max-width: 100%; height: auto; cursor: pointer; border: 2px solid #e0e0e0; border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
@@ -525,10 +463,10 @@
                                     Checklist 3: Checklist to determine power supply, water connections, etc.
                                 </h4>
                                 <div class="resource-buttons">
-                                    <button onclick="openFileViewer('3 - OPD - Equipment & Power Requirements - Checklist_for HTML.pdf', 'pdf')" class="btn-resource">
+                                    <button onclick="openFileViewer('Chapter-6a/3 - OPD - Equipment & Power Requirements - Checklist_for HTML.pdf', 'pdf')" class="btn-resource">
                                         <i class="fas fa-eye"></i> Click to view pdf
                                     </button>
-                                    <a href="3 - OPD - Equipment & Power Requirements - Checklist_for HTML.xlsx" download class="btn-resource">
+                                    <a href="Chapter-6a/3 - OPD - Equipment & Power Requirements - Checklist_for HTML.xlsx" download class="btn-resource">
                                         <i class="fas fa-download"></i> Click to download excel 
                                     </a>
                                 </div>
@@ -553,10 +491,10 @@
                                         1. Checklist 1 – List of services and investigations
                                     </h3>
                                     <div class="resource-buttons" style="margin-left: 20px;">
-                                        <button onclick="openFileViewer('1 - OPD - List of Services and Investigations_for HTML.pdf', 'pdf')" class="btn-resource">
+                                        <button onclick="openFileViewer('Chapter-6a/1 - OPD - List of Services and Investigations_for HTML.pdf', 'pdf')" class="btn-resource">
                                             <i class="fas fa-eye"></i> Click to view pdf
                                         </button>
-                                        <a href="1 - OPD - List of Services and Investigations_for HTML.xlsx" download class="btn-resource">
+                                        <a href="Chapter-6a/1 - OPD - List of Services and Investigations_for HTML.xlsx" download class="btn-resource">
                                             <i class="fas fa-download"></i> Click to download excel  
                                         </a>
                                     </div>
@@ -569,10 +507,10 @@
                                         2. Checklist 2 – Equipment and furniture requirements
                                     </h3>
                                     <div class="resource-buttons" style="margin-left: 20px;">
-                                        <button onclick="openFileViewer('2 - OPD - Checklist for Equipment & Furniture Requirements_for HTML.pdf', 'pdf')" class="btn-resource">
+                                        <button onclick="openFileViewer('Chapter-6a/2 - OPD - Checklist for Equipment & Furniture Requirements_for HTML.pdf', 'pdf')" class="btn-resource">
                                             <i class="fas fa-eye"></i> Click to view pdf
                                         </button>
-                                        <a href="2 - OPD - Equipment and Furniture Requirements_for HTML.xlsx" download class="btn-resource">
+                                        <a href="Chapter-6a/2 - OPD - Equipment and Furniture Requirements_for HTML.xlsx" download class="btn-resource">
                                             <i class="fas fa-download"></i> Click to download excel  
                                         </a>
                                     </div>
@@ -584,10 +522,10 @@
                                         3. Checklist 3 – Checklist to determine power supply, water connections, etc.
                                     </h3>
                                     <div class="resource-buttons" style="margin-left: 20px;">
-                                        <button onclick="openFileViewer('3 - OPD - Equipment & Power Requirements - Checklist_for HTML.pdf', 'pdf')" class="btn-resource">
+                                        <button onclick="openFileViewer('Chapter-6a/3 - OPD - Equipment & Power Requirements - Checklist_for HTML.pdf', 'pdf')" class="btn-resource">
                                             <i class="fas fa-eye"></i> Click to view pdf
                                         </button>
-                                        <a href="3 - OPD - Equipment & Power Requirements - Checklist_for HTML.xlsx" download class="btn-resource">
+                                        <a href="Chapter-6a/3 - OPD - Equipment & Power Requirements - Checklist_for HTML.xlsx" download class="btn-resource">
                                             <i class="fas fa-download"></i> Click to download excel  
                                         </a>
                                     </div>
@@ -609,7 +547,7 @@
                                         <div style="margin-bottom: 20px;">
                                             <p style="margin-bottom: 10px; font-weight: 500;">• Consultation room 1</p>
                                             <div class="resource-buttons" style="margin-left: 15px;">
-                                                <button onclick="openFileViewer('1a - Consultation Room.pdf', 'pdf')" class="btn-resource">
+                                                <button onclick="openFileViewer('Chapter-6a/1a - Consultation Room.pdf', 'pdf')" class="btn-resource">
                                                     <i class="fas fa-eye"></i> Click to view pdf
                                                 </button>
                                             </div>
@@ -617,7 +555,7 @@
                                         <div style="margin-bottom: 20px;">
                                             <p style="margin-bottom: 10px; font-weight: 500;">• Consultation room – different settings</p>
                                             <div class="resource-buttons" style="margin-left: 15px;">
-                                                <button onclick="openFileViewer('1b - Consultation Room - Different Settings.pdf', 'pdf')" class="btn-resource">
+                                                <button onclick="openFileViewer('Chapter-6a/1b - Consultation Room - Different Settings.pdf', 'pdf')" class="btn-resource">
                                                     <i class="fas fa-eye"></i> Click to view pdf
                                                 </button>
                                             </div>
@@ -625,7 +563,7 @@
                                         <div style="margin-bottom: 20px;">
                                             <p style="margin-bottom: 10px; font-weight: 500;">• Consultation room 2 (Paediatric)</p>
                                             <div class="resource-buttons" style="margin-left: 15px;">
-                                                <button onclick="openFileViewer('2 - Paediatric examination room.pdf', 'pdf')" class="btn-resource">
+                                                <button onclick="openFileViewer('Chapter-6a/2 - Paediatric examination room.pdf', 'pdf')" class="btn-resource">
                                                     <i class="fas fa-eye"></i> Click to View pdf
                                                 </button>
                                             </div>
@@ -633,7 +571,7 @@
                                         <div style="margin-bottom: 0;">
                                             <p style="margin-bottom: 10px; font-weight: 500;">• Consultation room – 3D rendition</p>
                                             <div class="resource-buttons" style="margin-left: 15px;">
-                                                <button onclick="openFileViewer('1d - Consultation Room - 3D Rendition.pdf', 'pdf')" class="btn-resource">
+                                                <button onclick="openFileViewer('Chapter-6a/1d - Consultation Room - 3D Rendition.pdf', 'pdf')" class="btn-resource">
                                                     <i class="fas fa-eye"></i> Click to View pdf    
                                                 </button>
                                             </div>
@@ -647,7 +585,7 @@
                                         5. Layout 2 – Layout design of an outpatient clinic (Multi-station workflow model)
                                     </h3>
                                     <div class="resource-buttons" style="margin-left: 20px;">
-                                        <button onclick="openFileViewer('3 - OPD - Multi-station workflow of a secondary eye hospital.pdf', 'pdf')" class="btn-resource">
+                                        <button onclick="openFileViewer('Chapter-6a/3 - OPD - Multi-station workflow of a secondary eye hospital.pdf', 'pdf')" class="btn-resource">
                                             <i class="fas fa-eye"></i> Click to view pdf    
                                         </button>
                                     </div>
@@ -659,7 +597,7 @@
                                         6. Layout 3 – Refraction lane
                                     </h3>
                                     <div class="resource-buttons" style="margin-left: 20px;">
-                                        <button onclick="openFileViewer('4 - Refraction Unit.pdf', 'pdf')" class="btn-resource">
+                                        <button onclick="openFileViewer('Chapter-6a/4 - Refraction Unit.pdf', 'pdf')" class="btn-resource">
                                             <i class="fas fa-eye"></i> Click to view pdf
                                         </button>
                                     </div>
@@ -671,7 +609,7 @@
                                         7. Layout 4 – Investigation room (Basic needs)
                                     </h3>
                                     <div class="resource-buttons" style="margin-left: 20px;">
-                                        <button onclick="openFileViewer('5 - Investigation Room - Basic Need.pdf', 'pdf')" class="btn-resource">
+                                        <button onclick="openFileViewer('Chapter-6a/5 - Investigation Room - Basic Need.pdf', 'pdf')" class="btn-resource">
                                             <i class="fas fa-eye"></i> Click to view pdf
                                         </button>
                                     </div>
@@ -684,7 +622,7 @@
                                     </h3>
                                     <p style="margin-left: 20px; margin-bottom: 10px; color: #666; font-size: 0.95em;">This can be used as a refraction room or for other investigations</p>
                                     <div class="resource-buttons" style="margin-left: 20px;">
-                                        <button onclick="openFileViewer('6 - Investigation Room - Comprehensive Module.pdf', 'pdf')" class="btn-resource">
+                                        <button onclick="openFileViewer('Chapter-6a/6 - Investigation Room - Comprehensive Module.pdf', 'pdf')" class="btn-resource">
                                             <i class="fas fa-eye"></i> Click to view pdf
                                         </button>
                                     </div>
@@ -695,7 +633,7 @@
                                         9. Layout 6 – A typical scan room
                                     </h3>
                                     <div class="resource-buttons" style="margin-left: 20px;">
-                                        <button onclick="openFileViewer('6 - Multipurpose Scan room.pdf', 'pdf')" class="btn-resource">
+                                        <button onclick="openFileViewer('Chapter-6a/6 - Multipurpose Scan room.pdf', 'pdf')" class="btn-resource">
                                             <i class="fas fa-eye"></i> Click to View pdf
                                         </button>
                                     </div>
@@ -747,6 +685,6 @@
         </div>
     </div>
 
-    <script src="scripit.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="has-chapter-nav" data-chapter="chapter3">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -42,61 +42,7 @@
     </button>
 
     <div class="chapter-container">
-        <aside class="chapter-sidebar" id="chapterSidebar">
-            <div class="sidebar-header">
-                <div class="close-btn sidebar-close-btn" id="sidebarCloseBtn">
-                    <i class="fas fa-times"></i>
-                </div>
-                <h3>Engaging the Architect</h3>
-            </div>
-            
-            <nav class="sidebar-nav">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <div class="nav-link parent-link active" data-content="intro">
-                            <i class="far fa-circle"></i>
-                            <span>A. Introduction</span>
-                        </div>
-                    </li>
-                    
-                    <li class="nav-item has-children">
-                        <div class="nav-link parent-link" data-content="approval-process">
-                            <i class="far fa-circle"></i>
-                            <span>B. Five Stage Process Integrated</span>
-                            <i class="fas fa-chevron-down dropdown-icon"></i>
-                        </div>
-
-                        <ul class="nav-sublist nav-sublist-level2">
-                            <li class="nav-item">
-                                <a href="#" class="nav-link subsection-link" data-content="preliminary-design">
-                                    <i class="far fa-circle"></i>
-                                    <span>1. Preliminary Design Submission</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link subsection-link" data-content="concept-design">
-                                    <i class="far fa-circle"></i>
-                                    <span>2. Concept Design Submission</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link subsection-link" data-content="statutory-approval">
-                                    <i class="far fa-circle"></i>
-                                    <span>3. Statutory Approval Submission</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <div class="nav-link parent-link" data-content="flowchart">
-                            <i class="far fa-circle"></i>
-                            <span>C. Flow Chart</span>
-                        </div>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        <aside class="chapter-sidebar" id="chapterSidebar"></aside>
 
         <main class="chapter-content">
             <div class="content-wrapper">
@@ -116,10 +62,7 @@
                         </div>
                     </div>
 
-                    <!-- 50th Logo OUTSIDE breadcrumb box -->
-                    <div class="chapter-logo-container">
-                        <img src="50 th_Final_Logo_2025_Black.png" alt="Aravind Eye Care Logo" class="chapter-logo">
-                    </div>
+                   
                 </div>
 
                 <article class="main-article">
@@ -141,7 +84,7 @@
                         <p>The approval process consists of the following five stages as illustrated. This design and approval process if done well should ensure the construction drawing; documentation and execution stages can proceed without the need for any intervention from the client team. Each stage is marked with</p>
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <img src="Engaging the architect/Five stages flow.jpg" alt="Five-Stage Approval Process" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <img src="Chapter-4\Five stages flow.jpg" alt="Five-Stage Approval Process" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                         </div>
 
                         <p>This section will focus on stages I, II and IV in detail since the other two stages are straightforward in terms of the details.</p>
@@ -244,7 +187,7 @@
                             <p style="margin-bottom: 25px; color: #4a4a4a; line-height: 1.8; font-size: 1.1rem;">Here is the flowchart that illustrates the steps and areas covered in each stage succinctly. This comprehensive diagram shows the complete workflow from initial planning through to final statutory approvals.</p>
                             
                             <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                                <a href="2 - Building design and development - Flow chart FINAL.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; background: #2c2c2c; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+                                <a href="Chapter-4\2 - Building design and development - Flow chart FINAL.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; background: #2c2c2c; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
                                     <i class="fas fa-eye" style="font-size: 1.1rem;"></i>
                                     <span>Click to View Flowchart </span>
                                 </a>
@@ -269,6 +212,6 @@
         </main>
     </div>
 
-    <script src="scripit.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

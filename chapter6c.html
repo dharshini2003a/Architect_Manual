@@ -8,7 +8,7 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="has-chapter-nav" data-chapter="chapter6c">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -42,55 +42,12 @@
     </button>
 
     <div class="chapter-container">
-        <aside class="chapter-sidebar" id="chapterSidebar">
-            <div class="sidebar-header">
-                <div class="close-btn sidebar-close-btn" id="sidebarCloseBtn">
-                    <i class="fas fa-times"></i>
-                </div>
-                <h3>Ambulatory and inpatient care</h3>
-            </div>
-            
-            <nav class="sidebar-nav">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <div class="nav-link parent-link active" data-content="intro">
-                            <i class="far fa-circle"></i>
-                            <span>Introduction</span>
-                        </div>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <div class="nav-link parent-link" data-content="design-considerations">
-                            <i class="far fa-circle"></i>
-                            <span>A) Ambulatory/inpatient care unit: design considerations</span>
-                        </div>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <div class="nav-link parent-link" data-content="safety-considerations">
-                            <i class="far fa-circle"></i>
-                            <span>B) Key considerations to ensure safe stay</span>
-                        </div>
-                    </li>
-
-                    <li class="nav-item">
-                        <div class="nav-link parent-link" data-content="resources">
-                            <i class="far fa-circle"></i>
-                            <span>List of resources</span>
-                        </div>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        <aside class="chapter-sidebar" id="chapterSidebar"></aside>
 
         <main class="chapter-content">
             <div class="content-wrapper">
                 <div class="content-header">
                     <div class="breadcrumb" id="breadcrumbNav">
-                    </div>
-                    <!-- 50th Logo OUTSIDE breadcrumb box -->
-                    <div class="chapter-logo-container">
-                        <img src="50 th_Final_Logo_2025_Black.png" alt="Aravind Eye Care Logo" class="chapter-logo">
                     </div>
                 </div>
 
@@ -102,7 +59,7 @@
                         
                         <div style="display: flex; gap: 30px; align-items: flex-start; margin: 20px 0;">
                             <div style="flex: 0 0 45%; min-width: 300px;">
-                                <img src="Chapter-5\Section 6C\Picture1.png" alt="Ambulatory and Inpatient Care" 
+                                <img src="Chapter-6c\Picture1.png" alt="Ambulatory and Inpatient Care" 
                                      style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer;"
                                      onclick="openImageModal(this)">
                             </div>
@@ -282,7 +239,7 @@
                                 <p style="margin-left: 20px; margin-bottom: 10px; color: #666; font-size: 0.95em;">Applicable for the scenario where the hospital plans to construct an inpatient unit within the hospital premise</p>
                                 <div class="resource-buttons" style="margin-left: 20px;">
                                     
-                                    <a href="A - Inpatient Care Checklist - Rooms- Equipment - Furniture.xlsx" download class="btn-resource">
+                                    <a href="Chapter-6c\A - Inpatient Care Checklist - Rooms- Equipment - Furniture.xlsx" download class="btn-resource">
                                         <i class="fas fa-download"></i> Click to download excel 
                                     </a>
                                 </div>
@@ -295,7 +252,7 @@
                                 </h3>
                                 <p style="margin-left: 20px; margin-bottom: 10px; color: #666; font-size: 0.95em;">Design specifications and layout for clinical exam room within ward area</p>
                                 <div class="resource-buttons" style="margin-left: 20px;">
-                                    <button onclick="openFileViewer('1 - Wards - Clinical exam room.pdf', 'pdf')" class="btn-resource">
+                                    <button onclick="openFileViewer('Chapter-6c/1 - Wards - Clinical exam room.pdf', 'pdf')" class="btn-resource">
                                         <i class="fas fa-eye"></i> Click to view pdf
                                     </button>
                                     
@@ -347,6 +304,6 @@
         </div>
     </div>
 
-    <script src="scripit.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
