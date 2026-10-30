@@ -3109,7 +3109,8 @@
         color: #c9a961;
     }
 
-    body.has-chapter-nav .chapter-link.active {
+    body.has-chapter-nav .chapter-link.active,
+    body.has-chapter-nav .chapter-link.current-chapter {
         background: #fbf6e9;
         color: #b89750;
         font-weight: 700;
@@ -3174,4 +3175,182 @@
         font-weight: 600;
         border-left: 3px solid #e3cf9c;
     }
+}
+
+
+/* Center the reading card on the SCREEN (not just in the space right of the sidebar).
+   Shifts left by up to 150px (half the sidebar), only when there is enough free space,
+   so it never touches the sidebar. */
+@media (min-width: 993px) {
+    body.has-chapter-nav .content-wrapper {
+        position: relative;
+        left: calc(-1 * clamp(0px, (100vw - 1580px) / 2, 150px));
+    }
+}
+
+
+/* ============================================================
+   SINGLE-PAGE CHAPTERS (body.single-page): all sections on one page
+   ============================================================ */
+body.single-page .content-block {
+    display: block !important;          /* never hidden */
+    scroll-margin-top: 90px;            /* clears the fixed navbar */
+}
+
+body.single-page .content-block + .content-block {
+    margin-top: 40px;
+}
+
+
+/* sidebar topic links are <a> here - keep them looking like the other topics */
+body.single-page a.topic-link,
+body.single-page a.subsection-link {
+    display: block;
+    text-decoration: none;
+}
+
+/* ============================================================
+   HOME PAGE: "EXPLORE THE CHAPTERS" cards (chapters 6, 7, 8)
+   ============================================================ */
+.chapter-explorer {
+    width: 100%;
+    max-width: 840px;
+    margin-top: 2.2rem;
+}
+
+.explore-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.explore-line-short { width: 44px; height: 2px; background: #c9a961; flex-shrink: 0; }
+.explore-line-long  { flex: 1; height: 1px; background: #ece6d6; }
+
+.explore-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #b89750;
+    white-space: nowrap;
+}
+
+.explore-counter {
+    color: #c9a961;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.explore-nav { display: flex; gap: 2px; }
+.explore-nav button {
+    background: none;
+    border: 0;
+    color: #c9a961;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 4px 8px;
+    transition: color 0.2s ease;
+}
+.explore-nav button:hover { color: #8a6d1f; }
+
+.explore-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.explore-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 235px;
+    padding: 22px 22px 24px;
+    color: #2c2c2c;
+    text-decoration: none;
+    background: transparent;
+    transition: background 0.3s ease, border-radius 0.3s ease;
+}
+
+.explore-card + .explore-card { border-left: 1px solid #ece6d6; }
+
+.explore-card::before {              /* gold bar on the active card */
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: #c9a961;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.explore-card.active {
+    background: #f8f3e6;
+    border-radius: 0 0 30px 0;
+}
+.explore-card.active::before { opacity: 1; }
+
+.explore-top {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.explore-num {
+    font-size: 2.1rem;
+    font-weight: 300;
+    line-height: 1;
+    color: #c9a961;
+}
+
+.explore-icon { width: 36px; height: 36px; color: #c9a961; }
+
+.explore-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+}
+
+.explore-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+}
+
+.explore-go {
+    margin-top: auto;
+    padding-top: 16px;
+}
+.explore-go i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid #c9a961;
+    border-radius: 50%;
+    color: #c9a961;
+    font-size: 0.8rem;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+.explore-card.active .explore-go i { background: #c9a961; color: #fff; }
+
+/* Medium screens: cards stack (3 columns would be too narrow) */
+@media (max-width: 1399px) {
+    .explore-cards { grid-template-columns: 1fr; }
+    .explore-card { min-height: 0; }
+    .explore-card + .explore-card { border-left: 0; border-top: 1px solid #ece6d6; }
+    .explore-top { margin-bottom: 12px; }
+}
+
+@media (max-width: 768px) {
+    .chapter-explorer { margin-top: 1.5rem; }
+    .explore-title { letter-spacing: 0.12em; font-size: 0.72rem; }
+    .explore-line-long { display: none; }
+    .explore-header { justify-content: space-between; }
+    .explore-line-short { display: none; }
 }

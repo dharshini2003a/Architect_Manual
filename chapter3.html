@@ -6,9 +6,10 @@
     <title>Engaging the Architect | Eye Care Design</title>
     <link rel="stylesheet" href="style.css">
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></noscript>
 </head>
-<body class="has-chapter-nav" data-chapter="chapter3">
+<body class="has-chapter-nav single-page" data-chapter="chapter3">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -78,7 +79,7 @@
                     </div>
 
                     <!-- B. THE APPROVAL PROCESS -->
-                    <div class="content-block" id="content-approval-process" style="display: none;">
+                    <div class="content-block" id="content-approval-process">
                         <h1 class="article-title">B. The approval process - A five-stage process integrated within the general design process</h1>
                         
                         <p>The approval process consists of the following five stages as illustrated. This design and approval process if done well should ensure the construction drawing; documentation and execution stages can proceed without the need for any intervention from the client team. Each stage is marked with</p>
@@ -91,7 +92,7 @@
                     </div>
 
                     <!-- 1. PRELIMINARY DESIGN -->
-                    <div class="content-block" id="content-preliminary-design" style="display: none;">
+                    <div class="content-block" id="content-preliminary-design">
                         <h1 class="article-title">Key stages: 1.Preliminary design submission</h1>
                         
                         <h3>a) Purpose</h3>
@@ -124,7 +125,7 @@
                     </div>
 
                     <!-- 2. CONCEPT DESIGN -->
-                    <div class="content-block" id="content-concept-design" style="display: none;">
+                    <div class="content-block" id="content-concept-design">
                         <h1 class="article-title">Key stages: 2. Concept design submissions</h1>
                         
                         <h3>a) Purpose</h3>
@@ -162,7 +163,7 @@
                     </div>
 
                     <!-- 3. STATUTORY APPROVAL -->
-                    <div class="content-block" id="content-statutory-approval" style="display: none;">
+                    <div class="content-block" id="content-statutory-approval">
                         <h1 class="article-title">Key stages: 3. statutory approval submission</h1>
                         
                         <h3>a) Purpose</h3>
@@ -177,7 +178,7 @@
                     </div>
 
                   <!-- C. FLOWCHART -->
-                    <div class="content-block" id="content-flowchart" style="display: none;">
+                    <div class="content-block" id="content-flowchart">
                         <h1 class="article-title">C. Flowchart</h1>
                         
                         <div style="padding: 30px; background: #f8f8f8; border-radius: 12px; border-left: 5px solid #c9a961;">
@@ -199,12 +200,13 @@
                 </article>
 
                 <div class="content-navigation-static">
-                    <button class="nav-btn prev-btn" id="prevBtn" style="display: flex;">
+                    <button class="nav-btn prev-btn" id="prevBtn" style="display: flex;" onclick="window.location.href='chapter2.html'">
                         <i class="fas fa-chevron-left"></i>
                         <span>Previous Chapter</span>
                     </button>
-                    <button class="nav-btn next-btn" id="nextBtn" style="display: flex;">
-                        <span>Next</span>
+
+                    <button class="nav-btn next-btn" id="nextBtn" style="display: flex;" onclick="window.location.href='chapter4.html'">
+                        <span>Next Chapter</span>
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>

@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
-
-    /* ============================================================
+/* ============================================================
        SHARED CHAPTER SIDEBAR (desktop: always open)
        Edit the CHAPTERS list below to add / rename chapters & topics.
        - id        : must match <body data-chapter="ID"> of that page
@@ -9,11 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
        Pages need: <body class="has-chapter-nav" data-chapter="ID"> and
                    <aside class="chapter-sidebar" id="chapterSidebar"></aside>
     ============================================================ */
-    (function () {
+    
+function renderChapterSidebar() {
         var CHAPTERS = [
             { id: 'preface',  label: 'Preface', href: 'Preface.html' },
 
-            { id: 'chapter1', label: '2. Need and scope', href: 'chapter1.html',
+            { id: 'chapter1', label: '2. Need and scope', href: 'chapter1.html', singlePage: true,
               topics: [
                   { id: 'intro',       label: 'The Need and scope' },
                   { id: 'not-covered', label: 'What is not covered' },
@@ -22,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             { id: 'chapter2', label: '3. How to use the manual', href: 'chapter2.html' },
 
-            { id: 'chapter3', label: '4. Engaging the architect', href: 'chapter3.html',
+            { id: 'chapter3', label: '4. Engaging the architect', href: 'chapter3.html', singlePage: true,
               topics: [
                   { id: 'intro', label: 'A. Introduction' },
                   { id: 'approval-process', label: 'B. Five Stage Process Integrated',
@@ -34,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   { id: 'flowchart', label: 'C. Flow Chart' }
               ] },
 
-            { id: 'chapter4', label: '5. High-level considerations', href: 'chapter4.html',
+            { id: 'chapter4', label: '5. High-level considerations', href: 'chapter4.html', singlePage: true,
               topics: [
                   { id: 'intro',                  label: 'Introduction' },
                   { id: 'functional-adequacy',    label: 'A) Functional adequacy' },
@@ -42,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   { id: 'resources',              label: 'List of resources' }
               ] },
 
-            { id: 'chapter6a', label: '6a. Outpatient care', href: 'chapter6a.html',
+            { id: 'chapter6a', label: '6. Outpatient care', href: 'chapter6a.html', singlePage: true,
               topics: [
                   { id: 'intro', label: 'Introduction' },
                   { id: 'factors-influencing', label: 'A) Factors influencing space',
@@ -55,17 +54,16 @@ document.addEventListener('DOMContentLoaded', function() {
                   { id: 'resources',           label: 'List of resources' }
               ] },
 
-            { id: 'chapter6b', label: '6b. Operation theatre complex', href: 'chapter6b.html',
+            { id: 'chapter6b', label: '7. Operation theatre complex', href: 'chapter6b.html', singlePage: true,
               topics: [
                   { id: 'intro',                label: 'A. Introduction' },
                   { id: 'planning',             label: 'B. Planning for an OT Complex' },
-                  { id: 'layout-considerations',label: 'C. Key Layout Design Considerations (1-3)' },
-                  { id: 'design-elements',      label: 'C. Key Layout Design Considerations (4-6)' },
+                  { id: 'layout-considerations',label: 'C. Key Layout Design Considerations' },
                   { id: 'preferred-practices',  label: 'D. Preferred Practices' },
                   { id: 'resources',            label: 'List of Resources' }
               ] },
 
-            { id: 'chapter6c', label: '6c. Ambulatory and inpatient care', href: 'chapter6c.html',
+            { id: 'chapter6c', label: '8. Ambulatory and inpatient care', href: 'chapter6c.html', singlePage: true,
               topics: [
                   { id: 'intro',                 label: 'Introduction' },
                   { id: 'design-considerations', label: 'A) Ambulatory/inpatient care unit: design considerations' },
@@ -73,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   { id: 'resources',             label: 'List of resources' }
               ] },
 
-            { id: 'chapter7', label: '7. Patient and staff safety', href: 'chapter7.html',
+            { id: 'chapter7', label: '9. Patient and staff safety', href: 'chapter7.html', singlePage: true,
               topics: [
                   { id: 'intro',                 label: 'A) Introduction' },
                   { id: 'safety-building-design',label: 'B) Safety considerations in building design' },
@@ -83,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   { id: 'resources',             label: 'F) List of Resources' }
               ] },
 
-            { id: 'chapter8', label: '8. Energy efficient sustainable hospital infrastructure', href: 'chapter8.html',
+            { id: 'chapter8', label: '10. Energy efficient sustainable hospital infrastructure', href: 'chapter8.html', singlePage: true,
               topics: [
                   { id: 'intro',       label: 'Introduction' },
                   { id: 'procurement', label: '1. Procurement' },
@@ -97,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var sidebar = document.getElementById('chapterSidebar');
         if (!sidebar) return;
 
+        window.CHAPTER_LIST = CHAPTERS;
         var current = document.body.getAttribute('data-chapter');
 
         function esc(str) {
@@ -115,13 +114,28 @@ document.addEventListener('DOMContentLoaded', function() {
         CHAPTERS.forEach(function (ch) {
             var isActive = ch.id === current;
             html += '<li class="nav-item chapter-item' + (isActive ? ' is-current' : '') + '">';
-            html += '<a class="nav-link chapter-link' + (isActive ? ' active' : '') + '" href="' + esc(ch.href) + '">' +
+            html += '<a class="nav-link chapter-link' + (isActive ? ' current-chapter' : '') + '" href="' + esc(ch.href) + '">' +
                     '<span>' + esc(ch.label) + '</span></a>';
 
             // Topics are shown only under the chapter you are reading.
             if (isActive && ch.topics && ch.topics.length) {
                 html += '<ul class="chapter-topics">';
                 ch.topics.forEach(function (t) {
+                    if (ch.singlePage) {
+                        // Single-page chapter: topic (and sub-topic) = anchor that scrolls to the section
+                        html += '<li><a class="nav-link topic-link single-link" data-section="content-' + esc(t.id) + '" href="#content-' + esc(t.id) + '">' +
+                                '<span>' + esc(t.label) + '</span></a>';
+                        if (t.children && t.children.length) {
+                            html += '<ul class="chapter-subtopics">';
+                            t.children.forEach(function (c) {
+                                html += '<li><a class="nav-link subsection-link single-link" data-section="content-' + esc(c.id) + '" href="#content-' + esc(c.id) + '">' +
+                                        '<span>' + esc(c.label) + '</span></a></li>';
+                            });
+                            html += '</ul>';
+                        }
+                        html += '</li>';
+                        return;
+                    }
                     html += '<li><div class="nav-link parent-link topic-link" data-content="' + esc(t.id) + '">' +
                             '<span>' + esc(t.label) + '</span></div>';
                     if (t.children && t.children.length) {
@@ -141,9 +155,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         html += '</ul></nav>';
         sidebar.innerHTML = html;
-    })();
+    }
 
+(function () {
+    function ensureSidebar() {
+        var sb = document.getElementById('chapterSidebar');
+        if (sb && !sb.querySelector('.nav-list')) {
+            try { renderChapterSidebar(); } catch (e) { console.error('Sidebar error:', e); }
+        }
+    }
+    ensureSidebar();                                        // as soon as this script runs
+    document.addEventListener('DOMContentLoaded', ensureSidebar);  // safety net 1
+    window.addEventListener('load', ensureSidebar);                // safety net 2
+})();
 
+document.addEventListener('DOMContentLoaded', function() {
 
     /* ============================================================
        MOBILE DESKTOP-VIEW NOTICE
@@ -328,7 +354,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const isChapter8Energy = currentPage.includes('Championing Responsible Healthcare');
         const isChapterPlaceholder8 = currentPage.includes('Update Soon');
         
-        if (isChapter1) {
+        const __curCh = (window.CHAPTER_LIST || []).filter(function(c) { return c.id === document.body.getAttribute('data-chapter'); })[0];
+        if (document.body.classList.contains('single-page') || (__curCh && __curCh.singlePage)) {
+            initSinglePage();
+        } else if (isChapter1) {
             initChapter1Page();
         } else if (isChapter2) {
             initChapter2Page();
@@ -356,6 +385,107 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========================================
     // CHAPTER 1 - THE NEED AND SCOPE
     // ========================================
+    // ------------------------------------------------------------
+    // SINGLE-PAGE CHAPTER: all sections on one page, sidebar links
+    // scroll to the section, active topic follows the scroll.
+    // (Enable per page with <body class="single-page"> + singlePage:true in CHAPTERS)
+    // ------------------------------------------------------------
+    function initSinglePage() {
+        initSidebarToggle();
+
+        // Force single-page mode (so it works even if the HTML file is an older copy)
+        document.body.classList.add('single-page');
+        document.querySelectorAll('.content-block').forEach(function(b) { b.style.display = ''; });
+
+        // Bottom bar = previous / next CHAPTER (taken from the CHAPTERS order)
+        (function() {
+            const list = window.CHAPTER_LIST || [];
+            const id = document.body.getAttribute('data-chapter');
+            let idx = -1;
+            list.forEach(function(c, i) { if (c.id === id) idx = i; });
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            if (prevBtn) {
+                if (idx > 0) {
+                    prevBtn.style.display = 'flex';
+                    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i><span>Previous Chapter</span>';
+                    prevBtn.onclick = function() { window.location.href = list[idx - 1].href; };
+                } else { prevBtn.style.display = 'none'; }
+            }
+            if (nextBtn) {
+                if (idx > -1 && idx < list.length - 1) {
+                    nextBtn.style.display = 'flex';
+                    nextBtn.innerHTML = '<span>Next Chapter</span><i class="fas fa-chevron-right"></i>';
+                    nextBtn.onclick = function() { window.location.href = list[idx + 1].href; };
+                } else if (idx === list.length - 1) {
+                    nextBtn.style.display = 'flex';
+                    nextBtn.innerHTML = '<i class="fas fa-home"></i><span>Home</span>';
+                    nextBtn.onclick = function() { window.location.href = 'index.html'; };
+                } else { nextBtn.style.display = 'none'; }
+            }
+        })();
+
+        const links = Array.from(document.querySelectorAll('.single-link'));
+        const sections = links
+            .map(function(a) { return document.getElementById(a.getAttribute('data-section')); })
+            .filter(Boolean);
+        if (!links.length || !sections.length) return;
+
+        let lockUntil = 0;
+
+        function setActive(id) {
+            links.forEach(function(a) {
+                a.classList.toggle('active', a.getAttribute('data-section') === id);
+            });
+        }
+
+        function updateActiveOnScroll() {
+            if (Date.now() < lockUntil) return;
+            let current = sections[0].id;
+            sections.forEach(function(sec) {
+                if (sec.getBoundingClientRect().top <= 140) current = sec.id;
+            });
+            const atBottom = window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 4;
+            if (atBottom) current = sections[sections.length - 1].id;
+            setActive(current);
+        }
+
+        links.forEach(function(a) {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = a.getAttribute('data-section');
+                const target = document.getElementById(id);
+                if (!target) return;
+                setActive(id);
+                lockUntil = Date.now() + 800;
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                try { if (history.replaceState) history.replaceState(null, '', '#' + id); } catch (err) { /* file:// restriction - ignore */ }
+                if (window.innerWidth <= 992 && window.closeSidebar) window.closeSidebar();
+            });
+        });
+
+        let ticking = false;
+        window.addEventListener('scroll', function() {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(function() {
+                updateActiveOnScroll();
+                ticking = false;
+            });
+        }, { passive: true });
+
+        // On load: honour #section in the URL, otherwise highlight the first topic
+        const hash = (location.hash || '').replace('#', '');
+        const initial = document.getElementById(hash);
+        if (initial && sections.indexOf(initial) !== -1) {
+            setActive(hash);
+            lockUntil = Date.now() + 800;
+            setTimeout(function() { initial.scrollIntoView({ block: 'start' }); }, 50);
+        } else {
+            setActive(sections[0].id);
+        }
+    }
+
     function initChapter1Page() {
         const contentOrder = ['intro', 'not-covered', 'covered'];
         
@@ -2786,7 +2916,6 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 'intro',                   label: 'Introduction' },
             { id: 'planning',                label: 'Planning' },
             { id: 'layout-considerations',   label: 'Layout' },
-            { id: 'design-elements',         label: 'Design' },
             { id: 'preferred-practices',      label: 'Preferred' },
             { id: 'resources',               label: 'Resources' }
         ],
@@ -2961,7 +3090,6 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 'intro',                   name: 'Introduction' },
             { id: 'planning',                name: 'A) Planning' },
             { id: 'layout-considerations',   name: 'B) Layout Considerations' },
-            { id: 'design-elements',         name: 'C) Design Elements' },
             { id: 'preferred-practices',      name: 'D) Preferred Practices' },
             { id: 'resources',               name: 'List of Resources' }
         ],
@@ -3160,4 +3288,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* Re-run on resize */
     window.addEventListener('resize', cleanBreadcrumbMobile);
+});
+
+
+// ------------------------------------------------------------
+// HOME PAGE: "Explore the chapters" cards
+// hover / focus / arrows change the highlighted card and the 01 / 03 counter
+// ------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+    var box = document.getElementById('chapterExplorer');
+    if (!box) return;
+
+    var cards = Array.prototype.slice.call(box.querySelectorAll('.explore-card'));
+    var counter = box.querySelector('.explore-counter');
+    var prev = box.querySelector('.explore-prev');
+    var next = box.querySelector('.explore-next');
+    var current = 0;
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+    function setActive(i) {
+        current = (i + cards.length) % cards.length;
+        cards.forEach(function (card, idx) { card.classList.toggle('active', idx === current); });
+        if (counter) counter.textContent = pad(current + 1) + ' / ' + pad(cards.length);
+    }
+
+    cards.forEach(function (card, idx) {
+        card.addEventListener('mouseenter', function () { setActive(idx); });
+        card.addEventListener('focus', function () { setActive(idx); });
+    });
+    if (prev) prev.addEventListener('click', function () { setActive(current - 1); });
+    if (next) next.addEventListener('click', function () { setActive(current + 1); });
+
+    setActive(0);
 });

@@ -8,7 +8,7 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="chapter-page has-chapter-nav" data-chapter="chapter1">
+<body class="chapter-page has-chapter-nav single-page" data-chapter="chapter1">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -80,7 +80,7 @@
                         </div>
                     </div>
 
-                    <div class="content-block" id="content-not-covered" style="display: none;">
+                    <div class="content-block" id="content-not-covered">
                         <h1 class="article-title">What is not covered</h1>
                         
                         <div class="article-content">
@@ -96,7 +96,7 @@
                         </div>
                     </div>
 
-                    <div class="content-block" id="content-covered" style="display: none;">
+                    <div class="content-block" id="content-covered">
                         <h1 class="article-title">What is covered</h1>
                         
                         <div class="article-content">
@@ -112,17 +112,15 @@
                 </article>
 
                 <div class="content-navigation-static">
-                    <button class="nav-btn prev-btn" id="prevBtn" style="display: none;">
+                    <button class="nav-btn prev-btn" id="prevBtn" style="display: flex;" onclick="window.location.href='Preface.html'">
                         <i class="fas fa-chevron-left"></i>
-                        <span>Previous</span>
-                        
+                        <span>Previous Chapter</span>
                     </button>
-                     
-                    <button class="nav-btn next-btn" id="nextBtn" style="display: flex;">
-                        <span>Next</span>
+
+                    <button class="nav-btn next-btn" id="nextBtn" style="display: flex;" onclick="window.location.href='chapter2.html'">
+                        <span>Next Chapter</span>
                         <i class="fas fa-chevron-right"></i>
                     </button>
-                    
                 </div>
             </div>
         </main>
