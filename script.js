@@ -91,7 +91,7 @@ function renderChapterSidebar() {
                   { id: 'culture',     label: '5. Fostering a Culture of Sustainable Practices' }
               ] }
         ];
-
+        window.CHAPTER_LIST = CHAPTERS;
         var sidebar = document.getElementById('chapterSidebar');
         if (!sidebar) return;
 
@@ -158,9 +158,13 @@ function renderChapterSidebar() {
     }
 
 (function () {
-    function ensureSidebar() {
+        function ensureSidebar() {
         var sb = document.getElementById('chapterSidebar');
-        if (sb && !sb.querySelector('.nav-list')) {
+        if (!sb) {                                      // e.g. home page: only share the chapter list
+            if (!window.CHAPTER_LIST) { try { renderChapterSidebar(); } catch (e) {} }
+            return;
+        }
+        if (!sb.querySelector('.nav-list')) {
             try { renderChapterSidebar(); } catch (e) { console.error('Sidebar error:', e); }
         }
     }
@@ -3322,3 +3326,516 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setActive(0);
 });
+// ============================================================
+// SITE SEARCH
+//  - search box on every page (home page: big box, other pages: in the top bar)
+//  - typo tolerant, searches text + video / PDF / checklist / image names
+//  - result click -> jumps to the section and highlights the words / the file
+// When the site runs on a web server (Live Server / online) the pages are read
+// directly. When opened by double-click, search-index.js is used instead.
+// ============================================================
+(function () {
+    var STOP = { a:1, an:1, the:1, and:1, or:1, of:1, for:1, in:1, on:1, to:1, is:1, are:1, at:1, by:1,
+                 with:1, as:1, be:1, it:1, this:1, that:1, from:1, how:1, what:1, about:1 };
+
+    // Short forms / other spellings  ->  word used in the manual   (add your own here)
+    var SYN = { ot: 'theatre', theater: 'theatre', operating: 'operation',
+                opd: 'outpatient', ipd: 'inpatient', ward: 'inpatient',
+                ppt: 'powerpoint', xls: 'excel', excel: 'excel', movie: 'video', clip: 'video',
+                vdo: 'video', vid: 'video', vids: 'video', vedio: 'video', videoes: 'video' };
+
+    var MARK = '__manualSearch__';
+
+    function tokenize(str) {
+        return String(str).toLowerCase().replace(/[^a-z0-9]+/g, ' ').split(' ').filter(Boolean);
+    }
+    function stem(w) {
+        if (w.length > 4 && /ies$/.test(w)) w = w.slice(0, -3) + 'y';
+        else if (w.length > 3 && /(ches|shes|xes|sses)$/.test(w)) w = w.slice(0, -2);
+        else if (w.length > 3 && /s$/.test(w) && !/ss$/.test(w)) w = w.slice(0, -1);
+        if (w.length > 4 && /e$/.test(w)) w = w.slice(0, -1);
+        return w;
+    }
+    function matches(wordStem, q) {
+        return wordStem === q || (q.length >= 3 && wordStem.indexOf(q) === 0);
+    }
+    function esc(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function reEscape(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    function wordRegex(stems) {
+        return new RegExp('\\b(?:' + stems.map(reEscape).join('|') + ')[a-z0-9]*', 'gi');
+    }
+
+    // edit distance (swapped letters count as 1 mistake; stops early when larger than max)
+    function lev(a, b, max) {
+        var la = a.length, lb = b.length, d = [], i, j;
+        if (Math.abs(la - lb) > max) return max + 1;
+        for (i = 0; i <= la; i++) d[i] = [i];
+        for (j = 0; j <= lb; j++) d[0][j] = j;
+        for (i = 1; i <= la; i++) {
+            var rowMin = 99;
+            for (j = 1; j <= lb; j++) {
+                var cost = a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1;
+                d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+                if (i > 1 && j > 1 && a.charAt(i - 1) === b.charAt(j - 2) && a.charAt(i - 2) === b.charAt(j - 1)) {
+                    d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+                }
+                if (d[i][j] < rowMin) rowMin = d[i][j];
+            }
+            if (rowMin > max) return max + 1;
+        }
+        return d[la][lb];
+    }
+
+    // ---------- LIVE INDEXER ----------
+    // When the site runs from a web server (online, or VS Code "Live Server"), the pages
+    // themselves are read and indexed in the browser - so whatever you edit in a chapter
+    // is searchable immediately, no extra file / tool needed.
+    // (Opened as a plain file:// the browser blocks this, so search-index.js is used instead.)
+    var KINDS = { mp4: 'Video', mov: 'Video', webm: 'Video', m4v: 'Video', pdf: 'PDF', xlsx: 'Excel', xls: 'Excel',
+                  csv: 'Excel', pptx: 'PPT', ppt: 'PPT', docx: 'Word', doc: 'Word', jpg: 'Image', jpeg: 'Image',
+                  png: 'Image', gif: 'Image', webp: 'Image', svg: 'Image' };
+    var KIND_WORDS = { Video: 'video', PDF: 'pdf', Excel: 'excel spreadsheet', PPT: 'powerpoint presentation',
+                       Word: 'word document', Image: 'image figure illustration' };
+    var KIND_ORDER = ['Video', 'PDF', 'Excel', 'PPT', 'Word', 'Image'];
+
+    function clean(t) { return String(t || '').replace(/\s+/g, ' ').trim(); }
+
+    function pageEntries(ch, html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var out = [];
+        Array.prototype.forEach.call(doc.querySelectorAll('.content-block[id^="content-"]'), function (b) {
+            var titleEl = b.querySelector('.article-title');
+            var secTitle = clean(titleEl && titleEl.textContent) || ch.label;
+
+            var copy = b.cloneNode(true), junk = copy.querySelectorAll('.article-title, script, style'), j;
+            for (j = 0; j < junk.length; j++) junk[j].parentNode.removeChild(junk[j]);
+            var alts = [];
+            Array.prototype.forEach.call(b.querySelectorAll('img[alt]'), function (im) { alts.push(im.getAttribute('alt')); });
+            out.push({ c: ch.label, h: ch.href, s: b.id, t: secTitle, x: clean(copy.textContent + ' ' + alts.join(' ')) });
+
+            var res = {}, order = [], parent = '', item = '';
+            function labelAncestor(el) {
+                for (var p = el.parentNode; p && p !== b; p = p.parentNode) {
+                    var t = p.tagName && p.tagName.toLowerCase();
+                    if (/^h[2-6]$/.test(t) || (t === 'p' && /font-weight/.test(p.getAttribute('style') || ''))) return true;
+                }
+                return false;
+            }
+            function addRes(path, alt) {
+                path = String(path || '').trim();
+                try { path = decodeURIComponent(path); } catch (e) {}
+                if (!path || /^(https?:|#|mailto:|javascript:)/i.test(path)) return;
+                var norm = path.replace(/\\/g, '/'), base = norm.split('/').pop();
+                if (base.indexOf('.') === -1) return;
+                var dot = base.lastIndexOf('.'), name = base.slice(0, dot), kind = KINDS[base.slice(dot + 1).toLowerCase()];
+                if (!kind) return;
+                if (kind === 'Image' && norm.indexOf('/') === -1) return;
+                var key = name.toLowerCase();
+                if (!res[key]) {
+                    res[key] = { name: name, kinds: {}, title: item || parent || clean(alt) || clean(name.replace(/_for HTML/i, '').replace(/_/g, ' ')), parent: parent };
+                    order.push(key);
+                }
+                res[key].kinds[kind] = 1;
+            }
+
+            Array.prototype.forEach.call(b.querySelectorAll('*'), function (el) {
+                var tag = el.tagName.toLowerCase();
+                if (el.classList && el.classList.contains('article-title')) return;
+                var isParent = /^h[2-6]$/.test(tag);
+                var isItem = tag === 'strong' || tag === 'b' || (tag === 'p' && /font-weight/.test(el.getAttribute('style') || ''));
+                if ((isParent || isItem) && !labelAncestor(el)) {
+                    var txt = clean(el.textContent);
+                    if (txt && txt.length <= 170) { if (isParent) { parent = txt; item = ''; } else { item = txt; } }
+                }
+                if (tag === 'img') addRes(el.getAttribute('src'), el.getAttribute('alt'));
+                else if (tag === 'video' || tag === 'source' || tag === 'audio') addRes(el.getAttribute('src'));
+                else if (tag === 'a' && el.getAttribute('href')) addRes(el.getAttribute('href'));
+                else if (tag === 'button' && el.getAttribute('onclick')) {
+                    var re = /(?:openFileViewer|downloadFile)\(\s*['"]([^'"]+)['"]/g, m;
+                    while ((m = re.exec(el.getAttribute('onclick')))) addRes(m[1]);
+                }
+            });
+
+            order.forEach(function (key) {
+                var r = res[key], kinds = KIND_ORDER.filter(function (k) { return r.kinds[k]; });
+                out.push({ c: ch.label, h: ch.href, s: b.id, t: r.title, p: secTitle,
+                           x: clean(r.parent + ' ' + r.name + ' ' + kinds.map(function (k) { return KIND_WORDS[k]; }).join(' ')),
+                           k: kinds.join(' · '), f: r.name });
+            });
+        });
+        return out;
+    }
+
+    function liveIndex(done) {
+        var list = window.CHAPTER_LIST;
+        if (!/^https?:$/.test(location.protocol) || !list || !list.length || typeof DOMParser === 'undefined') { done(null); return; }
+        var parts = [], pending = list.length, failed = 0;
+        list.forEach(function (ch, i) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', ch.href, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState !== 4) return;
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try { parts[i] = pageEntries(ch, xhr.responseText); } catch (e) { failed++; }
+                } else { failed++; }
+                if (--pending === 0) {
+                    var all = [];
+                    parts.forEach(function (p) { if (p) all = all.concat(p); });
+                    done(all.length && failed < list.length ? all : null);
+                }
+            };
+            xhr.send();
+        });
+    }
+
+    // ---------- load + build the index (only when needed) ----------
+    var DOCS = [], VOCAB = {}, VOCAB_WORDS = [], STEMS = [];
+    var indexState = 0, waiters = [];            // 0 = not loaded, 1 = loading, 2 = ready
+
+    function buildIndex() {
+        if (DOCS.length) return;
+        var stemSet = {};
+        (window.SEARCH_INDEX || []).forEach(function (d) {
+            var tw = tokenize(d.t), lw = tokenize(d.c), xw = tokenize(d.x);
+            var doc = { d: d, t: tw.map(stem), l: lw.map(stem), x: xw.map(stem), lowerText: (d.t + ' ' + d.x).toLowerCase() };
+            DOCS.push(doc);
+            tw.concat(lw, xw).forEach(function (w) {
+                if (w.length < 3) return;
+                VOCAB[w] = (VOCAB[w] || 0) + 1;
+            });
+            doc.t.concat(doc.l, doc.x).forEach(function (st) { stemSet[st] = 1; });
+        });
+        VOCAB_WORDS = Object.keys(VOCAB);
+        STEMS = Object.keys(stemSet);
+    }
+    function flush(ok) { var w = waiters; waiters = []; w.forEach(function (fn) { fn(ok); }); }
+    function ensureIndex(done) {
+        if (indexState === 2) { done(true); return; }
+        if (window.SEARCH_INDEX) { buildIndex(); indexState = 2; done(true); return; }
+        waiters.push(done);
+        if (indexState === 1) return;
+        indexState = 1;
+        var finish = function (ok) { if (ok) { buildIndex(); indexState = 2; } else { indexState = 0; } flush(ok); };
+        var fromFile = function () {
+            var sc = document.createElement('script');
+            sc.src = 'search-index.js';
+            sc.onload = function () { finish(true); };
+            sc.onerror = function () { finish(false); };
+            document.head.appendChild(sc);
+        };
+        liveIndex(function (entries) {
+            if (entries) { window.SEARCH_INDEX = entries; window.SEARCH_SOURCE = 'live'; finish(true); }
+            else { window.SEARCH_SOURCE = 'file'; fromFile(); }
+        });
+    }
+
+    function known(q) {
+        for (var i = 0; i < STEMS.length; i++) if (matches(STEMS[i], q)) return true;
+        return false;
+    }
+    function closestWord(tok) {
+        var max = tok.length <= 3 ? 0 : (tok.length <= 5 ? 1 : (tok.length <= 8 ? 2 : 3));
+        if (!max) return null;
+        var best = null, bestD = 99, bestF = 0;
+        for (var i = 0; i < VOCAB_WORDS.length; i++) {
+            var w = VOCAB_WORDS[i];
+            if (Math.abs(w.length - tok.length) > max) continue;
+            var dd = lev(tok, w, max);
+            if (dd <= max && (dd < bestD || (dd === bestD && VOCAB[w] > bestF))) { best = w; bestD = dd; bestF = VOCAB[w]; }
+        }
+        return best;
+    }
+
+    // ---------- understand the query (fix spelling) ----------
+    function analyse(query, allowFix) {
+        var toks = tokenize(query).filter(function (t) { return !STOP[t] && t.length >= 2; });
+        var groups = [], fixed = false;
+
+        // "wheel chair" -> "wheelchair" (written apart in the question, together in the manual)
+        var joined = [];
+        for (var ti = 0; ti < toks.length; ti++) {
+            if (ti + 1 < toks.length && VOCAB[toks[ti] + toks[ti + 1]]) { joined.push(toks[ti] + toks[ti + 1]); ti++; fixed = true; }
+            else joined.push(toks[ti]);
+        }
+        toks = joined;
+
+        toks.forEach(function (t) {
+            var alts = [t];
+            if (SYN[t] && SYN[t] !== t) alts.push(SYN[t]);
+            var ok = alts.some(function (a) { return known(stem(a)); });
+            if (!ok && allowFix) {
+                var b = closestWord(t);
+                if (b) { alts = [b]; fixed = true; }
+                else {
+                    // "wheelchair" -> "wheel chair" (written together in the question, apart in the manual)
+                    for (var k = 3; k <= t.length - 3; k++) {
+                        var p1 = t.slice(0, k), p2 = t.slice(k);
+                        if (known(stem(p1)) && known(stem(p2))) {
+                            groups.push({ orig: p1, alts: [p1] });
+                            alts = [p2]; fixed = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            groups.push({ orig: t, alts: alts });
+        });
+        return { groups: groups, fixed: fixed,
+                 shown: groups.map(function (g) { return g.alts[0]; }).join(' ') };
+    }
+
+    // ---------- rank the entries ----------
+    function scoreDoc(doc, groups, needAll) {
+        var total = 0, matched = 0, labelHits = 0;
+        groups.forEach(function (g) {
+            var inT = false, inL = false, cnt = 0;
+            g.alts.forEach(function (a) {
+                var q = stem(a);
+                if (!inT) inT = doc.t.some(function (w) { return matches(w, q); });
+                if (!inL) inL = doc.l.some(function (w) { return matches(w, q); });
+                for (var i = 0; i < doc.x.length; i++) if (matches(doc.x[i], q)) cnt++;
+            });
+            if (inT || inL || cnt) {
+                matched++;
+                if (inL) labelHits++;
+                total += (inT ? 10 : 0) + (inL ? 6 : 0) + (cnt ? 2 + Math.min(cnt, 10) : 0);
+            }
+        });
+        if (needAll ? matched < groups.length : matched === 0) return -1;
+        var phrase = groups.map(function (g) { return g.alts[0]; }).join(' ');
+        if (groups.length > 1 && doc.lowerText.indexOf(phrase) !== -1) total += 8;
+        if (labelHits === groups.length && /intro/.test(doc.d.s) && !doc.d.f) total += 6;
+        return total;
+    }
+
+    function search(query, allowFix) {
+        var a = analyse(query, allowFix);
+        if (!a.groups.length) return { a: a, results: [], partial: false };
+        var run = function (needAll) {
+            return DOCS.map(function (doc) { return { doc: doc, score: scoreDoc(doc, a.groups, needAll) }; })
+                       .filter(function (r) { return r.score >= 0; })
+                       .sort(function (x, y) { return y.score - x.score; });
+        };
+        var res = run(true), partial = false;
+        if (!res.length && a.groups.length > 1) { res = run(false); partial = true; }
+        return { a: a, results: res, partial: partial };
+    }
+
+    function stemsOf(a) {
+        var out = [];
+        a.groups.forEach(function (g) { g.alts.forEach(function (x) { var s = stem(x); if (s.length >= 2 && out.indexOf(s) === -1) out.push(s); }); });
+        return out;
+    }
+
+    function snippet(doc, stems) {
+        var d = doc.d;
+        if (d.f) {      // a video / file / image entry
+            var line = (d.p ? d.p + ' · ' : '') + d.f;
+            return esc(line).replace(wordRegex(stems), function (w) { return '<mark>' + w + '</mark>'; });
+        }
+        var text = d.x, re = wordRegex(stems), m = re.exec(text), start = 0;
+        if (m) start = Math.max(0, m.index - 70);
+        if (start > 0) { var sp = text.indexOf(' ', start); if (sp !== -1 && sp < m.index) start = sp + 1; }
+        var piece = text.substr(start, 190);
+        if (start + 190 < text.length) { var ls = piece.lastIndexOf(' '); if (ls > 120) piece = piece.slice(0, ls); }
+        var html = esc(piece).replace(wordRegex(stems), function (w) { return '<mark>' + w + '</mark>'; });
+        return (start > 0 ? '… ' : '') + html + (start + piece.length < text.length ? ' …' : '');
+    }
+
+    // ---------- remember what was searched, so the next page can highlight it ----------
+    function remember(stems, file) {
+        try { window.name = MARK + JSON.stringify({ stems: stems, file: file || '', ts: Date.now() }); } catch (e) {}
+    }
+    function findResource(key) {
+        var k = String(key).toLowerCase();
+        var els = document.querySelectorAll('[onclick], a[href], video, source, img');
+        for (var i = 0; i < els.length; i++) {
+            var el = els[i];
+            var s = ((el.getAttribute('onclick') || '') + ' ' + (el.getAttribute('href') || '') + ' ' + (el.getAttribute('src') || '')).toLowerCase();
+            var dec = s;
+            try { dec = decodeURIComponent(s); } catch (e) {}
+            if (s.indexOf(k) !== -1 || dec.indexOf(k) !== -1) return el;
+        }
+        return null;
+    }
+    function applyHighlight() {
+        var raw = window.name || '';
+        if (raw.indexOf(MARK) !== 0) return;
+        window.name = '';
+        var data;
+        try { data = JSON.parse(raw.slice(MARK.length)); } catch (e) { return; }
+        if (!data || Date.now() - data.ts > 60000) return;
+
+        // a video / checklist / file was searched -> scroll to it and flash it
+        if (data.file) {
+            var el = findResource(data.file);
+            if (el) {
+                var box = (el.closest && el.closest('.resource-buttons, .resource-simple-buttons')) || el.parentElement || el;
+                box.classList.add('search-pulse');
+                if (box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(function () { box.classList.remove('search-pulse'); }, 5000);
+                return;
+            }
+        }
+
+        if (!data.stems || !data.stems.length) return;
+        var hash = (location.hash || '').replace('#', '');
+        var root = (hash && document.getElementById(hash)) || document.querySelector('.main-article') || document.body;
+        var re = wordRegex(data.stems), nodes = [];
+        var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+        var n;
+        while ((n = walker.nextNode())) {
+            var p = n.parentNode;
+            if (!p || /^(SCRIPT|STYLE|BUTTON|MARK|SVG)$/i.test(p.nodeName)) continue;
+            re.lastIndex = 0;
+            if (re.test(n.nodeValue)) nodes.push(n);
+        }
+        nodes.forEach(function (node) {
+            var frag = document.createDocumentFragment(), txt = node.nodeValue, last = 0, m;
+            re.lastIndex = 0;
+            while ((m = re.exec(txt))) {
+                if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+                var mk = document.createElement('mark');
+                mk.className = 'search-hit';
+                mk.textContent = m[0];
+                frag.appendChild(mk);
+                last = m.index + m[0].length;
+                if (m[0].length === 0) re.lastIndex++;
+            }
+            if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+            node.parentNode.replaceChild(frag, node);
+        });
+        var first = root.querySelector('mark.search-hit');
+        if (first && first.scrollIntoView) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ---------- the search box ----------
+    function makeNavSearch() {
+        if (document.getElementById('siteSearch')) return document.getElementById('siteSearch');   // home page has its own
+        var bar = document.querySelector('.nav-container');
+        if (!bar) return null;
+        var wrap = document.createElement('div');
+        wrap.className = 'nav-search';
+        wrap.id = 'siteSearch';
+        wrap.innerHTML =
+            '<button type="button" class="nav-search-toggle" aria-label="Search"><i class="fas fa-search"></i></button>' +
+            '<div class="search-box">' +
+                '<i class="fas fa-search search-icon"></i>' +
+                '<input type="text" id="siteSearchInput" placeholder="Search the manual…" autocomplete="off" spellcheck="false" aria-label="Search the manual">' +
+                '<button type="button" class="search-clear" aria-label="Clear search" hidden>&times;</button>' +
+            '</div>' +
+            '<div class="search-results" id="siteSearchResults" hidden></div>';
+        var toggle = bar.querySelector('.menu-toggle');
+        if (toggle) bar.insertBefore(wrap, toggle); else bar.appendChild(wrap);
+        return wrap;
+    }
+
+    function initBox(wrap) {
+        if (!wrap) return;
+        var input = wrap.querySelector('input');
+        var panel = wrap.querySelector('.search-results');
+        var clear = wrap.querySelector('.search-clear');
+        var toggleBtn = wrap.querySelector('.nav-search-toggle');
+        var items = [], active = -1, lastStems = [], noFix = false;
+
+        function close() { panel.hidden = true; active = -1; }
+        function setActive(i) {
+            if (!items.length) return;
+            active = (i + items.length) % items.length;
+            items.forEach(function (el, k) { el.classList.toggle('active', k === active); });
+            if (items[active].scrollIntoView) items[active].scrollIntoView({ block: 'nearest' });
+        }
+        function go(el) {
+            if (!el) return;
+            remember(lastStems, el.getAttribute('data-file'));
+            window.location.href = el.getAttribute('href');
+        }
+        function show(html) { panel.innerHTML = html; panel.hidden = false; items = []; active = -1; }
+
+        function render() {
+            var q = input.value.trim();
+            clear.hidden = !q;
+            if (!q) { close(); return; }
+            if (indexState !== 2) {
+                show('<div class="sr-empty">Loading search…</div>');
+                ensureIndex(function (ok) {
+                    if (!ok) { show('<div class="sr-empty">Search data (<b>search-index.js</b>) could not be loaded.<br>Please keep it in the same folder as the pages.</div>'); return; }
+                    if (input.value.trim() === q) render();
+                });
+                return;
+            }
+            var r = search(q, !noFix);
+            lastStems = stemsOf(r.a);
+            if (!r.a.groups.length) { close(); return; }
+            var html = '';
+
+            if (r.a.fixed) {
+                html += '<div class="sr-note">Showing results for <b>' + esc(r.a.shown) + '</b>' +
+                        ' <button type="button" class="sr-nofix">Search for “' + esc(q) + '” instead</button></div>';
+            } else if (r.partial) {
+                html += '<div class="sr-note">No section has all the words - showing partial matches</div>';
+            }
+
+            if (!r.results.length) {
+                show(html + '<div class="sr-empty">No results for <b>“' + esc(q) + '”</b>.<br>' +
+                     'Try a different word, e.g. <i>operation theatre</i>, <i>checklist</i>, <i>lighting</i>.</div>');
+            } else {
+                var shown = r.results.slice(0, 10);
+                shown.forEach(function (x) {
+                    var d = x.doc.d;
+                    var kind = d.k ? '<span class="sr-kind">' + esc(d.k) + '</span>' : '';
+                    var title = (d.t && d.t !== d.c) ? esc(d.t) : '';
+                    html += '<a class="sr-item" href="' + esc(d.h) + '#' + esc(d.s) + '"' + (d.f ? ' data-file="' + esc(d.f) + '"' : '') + '>' +
+                            '<span class="sr-chapter">' + esc(d.c) + '</span>' +
+                            ((title || kind) ? '<span class="sr-title">' + kind + title + '</span>' : '') +
+                            '<span class="sr-snippet">' + snippet(x.doc, lastStems) + '</span></a>';
+                });
+                if (r.results.length > shown.length) {
+                    html += '<div class="sr-more">+ ' + (r.results.length - shown.length) + ' more - add another word to narrow it down</div>';
+                }
+                panel.innerHTML = html; panel.hidden = false;
+                items = Array.prototype.slice.call(panel.querySelectorAll('.sr-item'));
+                active = -1;
+                items.forEach(function (el) { el.addEventListener('click', function () { remember(lastStems, el.getAttribute('data-file')); }); });
+                setActive(0);
+            }
+            var nf = panel.querySelector('.sr-nofix');
+            if (nf) nf.addEventListener('click', function () { noFix = true; render(); input.focus(); });
+        }
+
+        input.addEventListener('input', function () { noFix = false; render(); });
+        input.addEventListener('focus', function () { ensureIndex(function () {}); if (input.value.trim()) render(); });
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+            else if (e.key === 'Enter') { e.preventDefault(); go(items[active] || items[0]); }
+            else if (e.key === 'Escape') { close(); wrap.classList.remove('open'); input.blur(); }
+        });
+        clear.addEventListener('click', function () { input.value = ''; noFix = false; render(); input.focus(); });
+        if (toggleBtn) toggleBtn.addEventListener('click', function () {
+            var open = wrap.classList.toggle('open');
+            if (open) input.focus(); else close();
+        });
+        document.addEventListener('click', function (e) {
+            if (!wrap.contains(e.target)) { close(); wrap.classList.remove('open'); }
+        });
+        document.addEventListener('keydown', function (e) {
+            var tag = (document.activeElement && document.activeElement.tagName) || '';
+            if ((e.key === '/' && !/INPUT|TEXTAREA/.test(tag)) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) {
+                e.preventDefault();
+                wrap.classList.add('open');
+                input.focus(); input.select();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initBox(makeNavSearch());
+        setTimeout(applyHighlight, 450);
+    });
+
+    // for testing / future use
+    window.ManualSearch = { search: search, ensureIndex: ensureIndex, pageEntries: pageEntries };
+})();
