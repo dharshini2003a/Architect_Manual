@@ -91,11 +91,11 @@ function renderChapterSidebar() {
                   { id: 'culture',     label: '5. Fostering a Culture of Sustainable Practices' }
               ] }
         ];
+
         window.CHAPTER_LIST = CHAPTERS;
         var sidebar = document.getElementById('chapterSidebar');
         if (!sidebar) return;
 
-        window.CHAPTER_LIST = CHAPTERS;
         var current = document.body.getAttribute('data-chapter');
 
         function esc(str) {
@@ -158,7 +158,7 @@ function renderChapterSidebar() {
     }
 
 (function () {
-        function ensureSidebar() {
+    function ensureSidebar() {
         var sb = document.getElementById('chapterSidebar');
         if (!sb) {                                      // e.g. home page: only share the chapter list
             if (!window.CHAPTER_LIST) { try { renderChapterSidebar(); } catch (e) {} }
@@ -3326,13 +3326,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setActive(0);
 });
+
 // ============================================================
 // SITE SEARCH
 //  - search box on every page (home page: big box, other pages: in the top bar)
 //  - typo tolerant, searches text + video / PDF / checklist / image names
 //  - result click -> jumps to the section and highlights the words / the file
-// When the site runs on a web server (Live Server / online) the pages are read
-// directly. When opened by double-click, search-index.js is used instead.
+// The text it searches is in  search-index.js  (made by build_search_index.py).
+// That file is only downloaded when someone clicks the search box, so normal
+// page loading stays fast.
 // ============================================================
 (function () {
     var STOP = { a:1, an:1, the:1, and:1, or:1, of:1, for:1, in:1, on:1, to:1, is:1, are:1, at:1, by:1,
@@ -3838,4 +3840,88 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // for testing / future use
     window.ManualSearch = { search: search, ensureIndex: ensureIndex, pageEntries: pageEntries };
+})();
+
+
+// ============================================================
+// BRAND (top bar)
+//  - HOME page:      the ArchEye logo
+//  - all other pages: the heading "Guidelines for Designing an Eye Care Facility"
+//  - clicking either one goes to the home page
+//  - browser tab title ends with "| ArchEye"
+// Put your logo file in the same folder as the pages and name it  logo.jpg
+// (the script also tries logo.png, Arch_Eye_2.jpg and Arch_Eye_2.png, in this order).
+// ============================================================
+(function () {
+    // Put the exact name of YOUR logo file here (first in the list). If it is inside a folder, write the folder too,
+    // e.g.  'Images -Home/ArchEye.jpg'   -  the other names are tried automatically after it.
+    var LOGO_FILES = [
+        'Images -Home/Arch Eye 2.png',                                   // <- your logo (folder / file name)
+        'logo.jpg', 'logo.png', 'Arch_Eye_2.jpg', 'Arch_Eye_2.png',
+        'Images -Home/logo.jpg', 'Images -Home/logo.png', 'Images -Home/Arch_Eye_2.jpg', 'Images -Home/Arch_Eye_2.png',
+        'Images -Home/ArchEye.jpg', 'Images -Home/ArchEye.png'
+    ];
+    var LOGO_HEIGHT = 52;              // logo height in px (the top bar is 64px high - keep this at 56 or less)
+    var SITE_HEADING = 'Guidelines for Designing an Eye Care Facility';   // shown on all chapter pages
+    var SHOW_TAGLINE = true;           // only for Arch_Eye_2.png: false = show just the big "ArchEye" word
+
+    function setBrand() {
+        var box = document.querySelector('.nav-logo');
+        if (!box || box.querySelector('.brand-logo, .brand-title')) return;
+
+        // every page except the home page: text heading (click = home page)
+        if (document.querySelector('.chapter-container')) {      // chapter pages (Preface, 2 ... 10)
+            var t = document.createElement('a');
+            t.className = 'brand-title';
+            t.href = 'index.html';
+            t.title = 'Go to the home page';
+            t.setAttribute('aria-label', SITE_HEADING + ' - go to the home page');
+            var h = document.createElement('h2');
+            h.textContent = SITE_HEADING;
+            t.appendChild(h);
+            box.innerHTML = '';
+            box.appendChild(t);
+            return;
+        }
+
+        // home page: the logo
+        document.documentElement.style.setProperty('--logo-h', LOGO_HEIGHT + 'px');
+
+        var a = document.createElement('a');
+        a.href = 'index.html';
+        a.setAttribute('aria-label', 'ArchEye - go to the home page');
+        a.title = 'ArchEye - Home';
+        var img = document.createElement('img');
+        img.alt = 'ArchEye';
+        a.appendChild(img);
+
+        var n = 0;
+        function tryNext() {
+            if (n >= LOGO_FILES.length) {                 // no logo file found -> show the name as text
+                a.className = 'brand-logo no-img';
+                a.textContent = 'ArchEye';
+                if (window.console && console.warn) {
+                    console.warn('ArchEye logo NOT FOUND. These files were tried (next to the html pages): ' + LOGO_FILES.join(' | ') +
+                                 '  ->  put your logo there, or add its exact name at the top of LOGO_FILES in script.js');
+                }
+                return;
+            }
+            var file = LOGO_FILES[n++];
+            // "Arch Eye 2.png" has big white margins, which are cropped with CSS. Other files are shown as they are.
+            var cropped = /(^|\/)arch[ _]eye[ _]2\.png$/i.test(file);
+            a.className = 'brand-logo' + (cropped ? (SHOW_TAGLINE ? '' : ' brand-wordmark') : ' brand-plain');
+            img.src = file;
+        }
+        img.onerror = tryNext;
+        tryNext();
+        box.innerHTML = '';
+        box.appendChild(a);
+    }
+
+    function setTitle() {
+        document.title = document.title.replace(/\s*\|\s*(Eye Care Design|LAICO Architectural Manual|Architectural Manual)\s*$/i, ' | ArchEye');
+    }
+
+    setBrand();                                         // as soon as the page is ready (no flicker)
+    document.addEventListener('DOMContentLoaded', function () { setBrand(); setTitle(); });
 })();

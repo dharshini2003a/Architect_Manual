@@ -3354,6 +3354,8 @@ body.single-page a.subsection-link {
     .explore-header { justify-content: space-between; }
     .explore-line-short { display: none; }
 }
+
+
 /* ============================================================
    SITE SEARCH (home page)
    ============================================================ */
@@ -3501,6 +3503,8 @@ mark.search-hit {
 @media (max-width: 768px) {
     .search-box input { height: 50px; font-size: 0.95rem; }
 }
+
+
 /* ============================================================
    SEARCH IN THE TOP BAR (all chapter pages) + file / video results
    ============================================================ */
@@ -3596,6 +3600,8 @@ mark.search-hit {
         z-index: 1300;
     }
 }
+
+
 /* ============================================================
    REFERENCES: citation text that opens its PDF
    ============================================================ */
@@ -3614,4 +3620,97 @@ a.ref-link:hover {
     margin-left: 4px;
     font-size: 0.85em;
     color: #c9a961;
+}
+
+/* ============================================================
+   BRAND LOGO (top bar, all pages)
+   The logo image has a lot of white space around it, so it is cropped here with CSS:
+   image 1408 x 768 px, logo part = 1213 x 324 px starting at (98, 232)
+   ============================================================ */
+.nav-logo {
+    display: flex;
+    align-items: center;
+}
+
+.brand-logo {
+    --h: var(--logo-h, 48px);                    /* logo height in the top bar (set in script.js) */
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: var(--h);
+    width: calc(var(--h) * 1213 / 324);
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: opacity 0.2s ease;
+}
+.brand-logo:hover { opacity: 0.85; }
+
+.brand-logo img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    max-width: none;
+    width: calc(100% * 1408 / 1213);
+    height: auto;
+    transform: translate(calc(-100% * 98 / 1408), calc(-100% * 232 / 768));
+}
+
+/* only the big "ArchEye" word (no tagline line) */
+.brand-logo.brand-wordmark {
+    --h: calc(var(--logo-h, 48px) * 0.78);
+    width: calc(var(--h) * 1213 / 272);
+}
+
+/* any other logo file (e.g. logo.jpg): shown as it is, at the top-bar height */
+.brand-logo.brand-plain {
+    width: auto;
+    overflow: visible;
+}
+.brand-logo.brand-plain img {
+    position: static;
+    display: block;
+    width: auto;
+    height: 100%;
+    max-width: none;
+    transform: none;
+}
+
+/* if the logo file is not found, the name is shown as text */
+.brand-logo.no-img {
+    width: auto;
+    height: auto;
+    overflow: visible;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2d38;
+}
+
+@media (max-width: 768px) {
+    .brand-logo { --h: calc(var(--logo-h, 48px) * 0.8); }
+    .brand-logo.brand-wordmark { --h: calc(var(--logo-h, 48px) * 0.62); }
+}
+
+/* ============================================================
+   TOP BAR HEADING on the chapter pages (click = home page)
+   ============================================================ */
+.nav-logo { min-width: 0; }
+
+.nav-logo .brand-title {
+    display: block;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease;
+}
+.nav-logo .brand-title:hover { opacity: 0.8; }
+
+.nav-logo .brand-title h2 {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;     /* long heading is cut with ... on narrow screens */
+}
+
+@media (max-width: 768px) {
+    .nav-logo .brand-title h2 { font-size: 1rem; }
 }
