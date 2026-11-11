@@ -3925,3 +3925,160 @@ document.addEventListener('DOMContentLoaded', function () {
     setBrand();                                         // as soon as the page is ready (no flicker)
     document.addEventListener('DOMContentLoaded', function () { setBrand(); setTitle(); });
 })();
+
+
+/* =====================================================================
+   FEEDBACK POPUP  (works on every page that loads script.js)
+   - Top-corner "Feedback" button (navbar) + footer link + menu "Feedback" link
+   - User types only the message (email id NOT needed from the user)
+   - Message is delivered to YOUR mail through Web3Forms (free)
+   ===================================================================== */
+(function () {
+    'use strict';
+
+    // ====== CHANGE ONLY THESE TWO LINES ======
+    var ACCESS_KEY = 'PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE';   // from https://web3forms.com  (enter your mail id there, key comes to that mail)
+    var SUBJECT    = 'Architectural Manual - New Feedback';
+    // =========================================
+
+    function pageName() {
+        var h1 = document.querySelector('.article-title');
+        var t = (h1 ? h1.textContent : document.title) || '';
+        return t.replace(/\s+/g, ' ').trim();
+    }
+
+    function build() {
+        if (document.getElementById('fbModal')) return;
+
+
+        // top-corner button inside the navbar
+        var navBox = document.querySelector('.navbar .nav-container');
+        if (navBox && !navBox.querySelector('.fb-nav-btn')) {
+            var nb = document.createElement('button');
+            nb.type = 'button';
+            nb.className = 'fb-nav-btn';
+            nb.setAttribute('data-feedback', '');
+            nb.setAttribute('aria-label', 'Give feedback');
+            nb.innerHTML = '<i class="fas fa-comment-dots"></i><span>Feedback</span>';
+            var mt = navBox.querySelector('.menu-toggle');
+            if (mt) navBox.insertBefore(nb, mt); else navBox.appendChild(nb);
+        }
+
+        // modal
+        var m = document.createElement('div');
+        m.id = 'fbModal';
+        m.className = 'fb-modal';
+        m.setAttribute('role', 'dialog');
+        m.setAttribute('aria-modal', 'true');
+        m.setAttribute('aria-labelledby', 'fbTitle');
+        m.innerHTML =
+            '<div class="fb-box">' +
+              '<button type="button" class="fb-close" id="fbClose" aria-label="Close">&times;</button>' +
+              '<div id="fbFormWrap">' +
+                '<h3 id="fbTitle">Share your feedback</h3>' +
+                '<p class="fb-sub">Your suggestions help us improve this manual. No email id needed.</p>' +
+                '<form id="fbForm" novalidate>' +
+                  '<input type="checkbox" name="botcheck" id="fbBot" tabindex="-1" autocomplete="off" style="display:none">' +
+                  '<label for="fbName">Name <span>(optional)</span></label>' +
+                  '<input type="text" id="fbName" maxlength="80" placeholder="Your name">' +
+                  '<label for="fbMsg">Feedback / Comments <b>*</b></label>' +
+                  '<textarea id="fbMsg" rows="5" maxlength="2000" placeholder="Type your feedback here…"></textarea>' +
+                  '<div class="fb-error" id="fbError" hidden></div>' +
+                  '<button type="submit" class="fb-send" id="fbSend"><i class="fas fa-paper-plane"></i> Send Feedback</button>' +
+                '</form>' +
+              '</div>' +
+              '<div id="fbThanks" class="fb-thanks" hidden>' +
+                '<i class="fas fa-circle-check"></i>' +
+                '<h3>Thank you!</h3>' +
+                '<p>Your feedback has been sent to us.</p>' +
+                '<button type="button" class="fb-send" id="fbDone">Close</button>' +
+              '</div>' +
+            '</div>';
+        document.body.appendChild(m);
+
+        var form = document.getElementById('fbForm');
+        var msg = document.getElementById('fbMsg');
+        var err = document.getElementById('fbError');
+        var send = document.getElementById('fbSend');
+        var wrap = document.getElementById('fbFormWrap');
+        var thanks = document.getElementById('fbThanks');
+
+        function open() {
+            wrap.hidden = false; thanks.hidden = true; err.hidden = true;
+            m.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            setTimeout(function () { msg.focus(); }, 60);
+        }
+        function close() {
+            m.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        window.openFeedback = open;
+
+        document.getElementById('fbClose').addEventListener('click', close);
+        document.getElementById('fbDone').addEventListener('click', function () { close(); form.reset(); });
+        m.addEventListener('click', function (e) { if (e.target === m) close(); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && m.classList.contains('open')) close(); });
+
+        // menu "Feedback" link, footer link, or any element with data-feedback / href="#feedback"
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest && e.target.closest('a[href="#feedback"], [data-feedback]');
+            if (a) { e.preventDefault(); open(); }
+        });
+
+        // footer link (home page has a footer)
+        var footer = document.querySelector('.footer .container');
+        if (footer && !footer.querySelector('.fb-footer-link')) {
+            var l = document.createElement('a');
+            l.href = '#feedback';
+            l.className = 'fb-footer-link';
+            l.textContent = 'Give Feedback';
+            footer.appendChild(l);
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            err.hidden = true;
+            var text = msg.value.trim();
+            if (document.getElementById('fbBot').checked) return;   // spam bot
+            if (text.length < 5) { err.textContent = 'Please type your feedback (at least a few words).'; err.hidden = false; return; }
+            if (ACCESS_KEY.indexOf('PASTE_') === 0) { err.textContent = 'Feedback is not configured yet (access key missing).'; err.hidden = false; return; }
+
+            send.disabled = true;
+            send.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    access_key: ACCESS_KEY,
+                    subject: SUBJECT,
+                    from_name: 'Architectural Manual Website',
+                    name: document.getElementById('fbName').value.trim() || 'Anonymous',
+                    message: text,
+                    page: pageName(),
+                    page_url: location.href
+                })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d && d.success) {
+                    wrap.hidden = true; thanks.hidden = false; form.reset();
+                } else {
+                    throw new Error((d && d.message) || 'Failed');
+                }
+            })
+            .catch(function () {
+                err.textContent = 'Could not send right now. Please check your internet and try again.';
+                err.hidden = false;
+            })
+            .then(function () {
+                send.disabled = false;
+                send.innerHTML = '<i class="fas fa-paper-plane"></i> Send Feedback';
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
+    else build();
+})();
