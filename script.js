@@ -107,9 +107,7 @@ function renderChapterSidebar() {
                 '<div class="close-btn sidebar-close-btn" id="sidebarCloseBtn"><i class="fas fa-times"></i></div>' +
                 '<h3>Contents</h3>' +
             '</div>' +
-            '<nav class="sidebar-nav"><ul class="nav-list">' +
-            '<li class="nav-item chapter-item"><a class="nav-link chapter-link" href="index.html">' +
-            '<span><i class="fas fa-home" style="margin-right:8px;"></i>Home</span></a></li>';
+            '<nav class="sidebar-nav"><ul class="nav-list">';
 
         CHAPTERS.forEach(function (ch) {
             var isActive = ch.id === current;
@@ -3856,35 +3854,21 @@ document.addEventListener('DOMContentLoaded', function () {
     // Put the exact name of YOUR logo file here (first in the list). If it is inside a folder, write the folder too,
     // e.g.  'Images -Home/ArchEye.jpg'   -  the other names are tried automatically after it.
     var LOGO_FILES = [
-        'Images -Home/Arch Eye 2.png',                                   // <- your logo (folder / file name)
+        'Images -Home/ArchEye.png',                // <- your logo (folder / file name)
+        'Images -Home/Arch eye Logo .png',
         'logo.jpg', 'logo.png', 'Arch_Eye_2.jpg', 'Arch_Eye_2.png',
         'Images -Home/logo.jpg', 'Images -Home/logo.png', 'Images -Home/Arch_Eye_2.jpg', 'Images -Home/Arch_Eye_2.png',
         'Images -Home/ArchEye.jpg', 'Images -Home/ArchEye.png'
     ];
     var LOGO_HEIGHT = 52;              // logo height in px (the top bar is 64px high - keep this at 56 or less)
-    var SITE_HEADING = 'Guidelines for Designing an Eye Care Facility';   // shown on all chapter pages
+    var SITE_HEADING = 'Practical Considerations for Designing Efficient Eye Care Facilities';   // shown on all chapter pages
     var SHOW_TAGLINE = true;           // only for Arch_Eye_2.png: false = show just the big "ArchEye" word
 
     function setBrand() {
         var box = document.querySelector('.nav-logo');
         if (!box || box.querySelector('.brand-logo, .brand-title')) return;
 
-        // every page except the home page: text heading (click = home page)
-        if (document.querySelector('.chapter-container')) {      // chapter pages (Preface, 2 ... 10)
-            var t = document.createElement('a');
-            t.className = 'brand-title';
-            t.href = 'index.html';
-            t.title = 'Go to the home page';
-            t.setAttribute('aria-label', SITE_HEADING + ' - go to the home page');
-            var h = document.createElement('h2');
-            h.textContent = SITE_HEADING;
-            t.appendChild(h);
-            box.innerHTML = '';
-            box.appendChild(t);
-            return;
-        }
-
-        // home page: the logo
+        // logo on ALL pages (home + every chapter) - click = home page
         document.documentElement.style.setProperty('--logo-h', LOGO_HEIGHT + 'px');
 
         var a = document.createElement('a');
@@ -3951,15 +3935,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (document.getElementById('fbModal')) return;
 
 
-        // top-corner button inside the navbar
+        // top-corner: "Suggest feedback: email id" (click = opens the mail app with the To: address filled)
         var navBox = document.querySelector('.navbar .nav-container');
-        if (navBox && !navBox.querySelector('.fb-nav-btn')) {
-            var nb = document.createElement('button');
-            nb.type = 'button';
-            nb.className = 'fb-nav-btn';
-            nb.setAttribute('data-feedback', '');
-            nb.setAttribute('aria-label', 'Give feedback');
-            nb.innerHTML = '<i class="fas fa-comment-dots"></i><span>Feedback</span>';
+        if (navBox && !navBox.querySelector('.fb-nav-mail')) {
+            var nb = document.createElement('a');
+            nb.className = 'fb-nav-mail';
+            nb.href = 'mailto:laicoinfo@aravind.org?subject=Feedback%20-%20Guidelines%20for%20Designing%20an%20Eye%20Care%20Facility';
+            nb.setAttribute('aria-label', 'Suggest feedback by email: laicoinfo@aravind.org');
+            nb.innerHTML = '<i class="fas fa-envelope"></i>' +
+                           '<span class="fb-mail-label">Suggest feedback:</span>' +
+                           '<span class="fb-mail-id">laicoinfo@aravind.org</span>';
             var mt = navBox.querySelector('.menu-toggle');
             if (mt) navBox.insertBefore(nb, mt); else navBox.appendChild(nb);
         }
@@ -4026,16 +4011,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (a) { e.preventDefault(); open(); }
         });
 
-        // footer link (home page has a footer)
-        var footer = document.querySelector('.footer .container');
-        if (footer && !footer.querySelector('.fb-footer-link')) {
-            var l = document.createElement('a');
-            l.href = '#feedback';
-            l.className = 'fb-footer-link';
-            l.textContent = 'Give Feedback';
-            footer.appendChild(l);
-        }
-
         form.addEventListener('submit', function (e) {
             e.preventDefault();
             err.hidden = true;
@@ -4081,4 +4056,157 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
     else build();
+})();
+
+/* =====================================================================
+   MOBILE / TABLET MENU  (the hamburger  ☰  in the top bar)
+   ---------------------------------------------------------------------
+   CHANGE ONLY THIS ONE WORD TO SWITCH BETWEEN THE TWO OPTIONS:
+
+     'drawer'  ->  OPTION 1 : right-side drawer with the list of all chapters
+                              (+ "Suggest feedback" mail link)
+     'none'    ->  OPTION 2 : no hamburger at all (top bar = logo + mail icon only)
+   ===================================================================== */
+(function () {
+    var MOBILE_MENU = 'none';            // <-- 'none' = no hamburger menu (simple)  |  'drawer' = chapters drawer
+
+    document.documentElement.setAttribute('data-mobile-menu', MOBILE_MENU);
+    if (MOBILE_MENU !== 'drawer') return;
+
+    function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+    function buildDrawer() {
+        var overlay = document.getElementById('menuOverlay');
+        if (!overlay) return;
+        var content = overlay.querySelector('.menu-content');
+        if (!content || content.querySelector('.drawer-nav')) return;
+
+        if (!window.CHAPTER_LIST && typeof renderChapterSidebar === 'function') {
+            try { renderChapterSidebar(); } catch (e) {}
+        }
+        var list = window.CHAPTER_LIST || [];
+        var current = document.body.getAttribute('data-chapter');
+
+        var old = content.querySelector('.menu-items');
+        if (old) old.parentNode.removeChild(old);
+
+        var html = '<div class="drawer-title">Contents</div><nav class="drawer-nav"><ul>';
+        list.forEach(function (ch) {
+            html += '<li><a href="' + esc(ch.href) + '"' + (ch.id === current ? ' class="is-current"' : '') + '>' + esc(ch.label) + '</a></li>';
+        });
+        html += '</ul></nav>' +
+                '<a class="drawer-mail" href="mailto:laicoinfo@aravind.org?subject=Feedback%20-%20Guidelines%20for%20Designing%20an%20Eye%20Care%20Facility">' +
+                '<i class="fas fa-envelope"></i><span>Suggest feedback<br><b>laicoinfo@aravind.org</b></span></a>';
+        content.insertAdjacentHTML('beforeend', html);
+
+        // close the drawer after tapping a link, and with the Esc key
+        function close() { overlay.classList.remove('active'); document.body.style.overflow = 'auto'; }
+        content.querySelectorAll('.drawer-nav a, .drawer-mail').forEach(function (a) { a.addEventListener('click', close); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', buildDrawer);
+    else buildDrawer();
+})();
+
+
+/* =====================================================================
+   CHAPTER PAGES (phone / tablet, width <= 992px):
+   ☰ at the LEFT of the top bar opens a small menu:
+        Home        -> home page
+        Chapters    -> opens the Table of Contents (the Contents sidebar)
+        Feedback    -> opens the mail app (To: laicoinfo@aravind.org)
+   On desktop the Contents sidebar is always open, so this ☰ is hidden there.
+   ===================================================================== */
+(function () {
+    var MAIL = 'mailto:laicoinfo@aravind.org?subject=Feedback%20-%20Guidelines%20for%20Designing%20an%20Eye%20Care%20Facility';
+
+    function init() {
+        var sb  = document.getElementById('chapterSidebar');
+        var bar = document.querySelector('.navbar .nav-container');
+        var isHome = false;
+        if (!bar || document.getElementById('navSidebarBtn')) return;
+
+        // HOME page: no sidebar exists, so build a "Contents" panel from the same chapter list
+        if (!sb) {
+            if (document.querySelector('.chapter-container')) return;      // a chapter page without sidebar: nothing to do
+            if (!window.CHAPTER_LIST && typeof renderChapterSidebar === 'function') { try { renderChapterSidebar(); } catch (e) {} }
+            var list = window.CHAPTER_LIST || [];
+            if (!list.length) return;
+            function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+            sb = document.createElement('aside');
+            sb.className = 'home-contents';
+            var h = '<div class="drawer-title">Contents</div><nav class="drawer-nav"><ul>';
+            list.forEach(function (ch) { h += '<li><a href="' + esc(ch.href) + '">' + esc(ch.label) + '</a></li>'; });
+            sb.innerHTML = h + '</ul></nav>';
+            document.body.appendChild(sb);
+            document.body.classList.add('has-home-menu');
+            isHome = true;
+        }
+
+        // ☰ button (left of the logo)
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = 'navSidebarBtn';
+        btn.className = 'nav-sidebar-btn';
+        btn.setAttribute('aria-label', 'Menu');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.innerHTML = '<span></span><span></span><span></span>';
+        bar.insertBefore(btn, bar.firstChild);
+
+        // small menu: Home / Chapters / Feedback
+        var menu = document.createElement('div');
+        menu.className = 'nav-menu';
+        menu.innerHTML =
+            '<a class="nav-menu-item" href="index.html"><i class="fas fa-home"></i><span>Home</span></a>' +
+            '<button type="button" class="nav-menu-item" id="navMenuChapters"><i class="fas fa-book-open"></i><span>Chapters</span><i class="fas fa-chevron-right nav-menu-arrow"></i></button>' +
+            '<a class="nav-menu-item" href="' + MAIL + '"><i class="fas fa-envelope"></i><span>Feedback</span></a>';
+        document.body.appendChild(menu);
+
+        var bd = document.createElement('div');
+        bd.className = 'nav-sidebar-backdrop';
+        document.body.appendChild(bd);
+
+        function setTop() {   // menu / sidebar start exactly under the top bar (also when the "best viewed on desktop" notice is shown)
+            var nb = document.querySelector('.navbar');
+            if (nb) document.body.style.setProperty('--nav-h', Math.round(nb.getBoundingClientRect().bottom) + 'px');
+        }
+        function sync() {
+            var sOpen = sb.classList.contains('sidebar-open');
+            var mOpen = menu.classList.contains('open');
+            bd.classList.toggle('show', sOpen || mOpen);
+            btn.setAttribute('aria-expanded', mOpen ? 'true' : 'false');
+            document.body.style.overflow = (sOpen || mOpen) ? 'hidden' : '';
+        }
+        new MutationObserver(sync).observe(sb,   { attributes: true, attributeFilter: ['class'] });
+        new MutationObserver(sync).observe(menu, { attributes: true, attributeFilter: ['class'] });
+
+        function closeAll() { sb.classList.remove('sidebar-open'); menu.classList.remove('open'); }
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            setTop();
+            if (sb.classList.contains('sidebar-open')) { closeAll(); return; }
+            menu.classList.toggle('open');
+        });
+
+        // "Chapters" -> show the Table of Contents
+        document.getElementById('navMenuChapters').addEventListener('click', function (e) {
+            e.stopPropagation();
+            setTop();
+            menu.classList.remove('open');
+            sb.classList.add('sidebar-open');
+        });
+        // Home / Feedback links close the menu
+        menu.addEventListener('click', function (e) {
+            if (e.target.closest && e.target.closest('a')) menu.classList.remove('open');
+        });
+
+        bd.addEventListener('click', closeAll);
+        sb.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a')) closeAll(); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+        window.addEventListener('resize', function () { if (window.innerWidth > 992) closeAll(); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
 })();
