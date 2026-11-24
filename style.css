@@ -4204,6 +4204,20 @@ body.has-home-menu .nav-sidebar-backdrop.show { opacity: 1; visibility: visible;
 a.popup-link { color: #a8872f; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(201,169,97,.7); cursor: pointer; }
 a.popup-link:hover { color: #c9a961; }
 
+/* Checklist link shown as ONE clickable box */
+.checklist-row a.popup-link {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 14px 22px; background: #faf8f2;
+    border: 1.5px solid #c9a961; border-left: 6px solid #c9a961; border-radius: 8px;
+    color: #2c2c2c; font-weight: 700; text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.checklist-row a.popup-link::after { content: "\2192"; color: #a8872f; font-size: 1.2em; transition: transform .2s ease; }
+.checklist-row a.popup-link:hover { background: #c9a961; color: #fff; box-shadow: 0 6px 16px rgba(0,0,0,.15); transform: translateY(-2px); }
+.checklist-row a.popup-link:hover::after { color: #fff; transform: translateX(4px); }
+.checklist-row a.popup-link:focus-visible { outline: 3px solid #c9a961; outline-offset: 3px; }
+
 .pf-overlay {
     position: fixed; inset: 0; z-index: 100000;      /* above the "best viewed on desktop" notice (99999) */
     background: rgba(10,10,10,.72);
