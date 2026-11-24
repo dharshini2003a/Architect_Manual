@@ -4086,3 +4086,106 @@ body.has-home-menu .nav-sidebar-backdrop.show { opacity: 1; visibility: visible;
 /* link to #content-disclaimer: keep the heading clear of the fixed top bar */
 #content-disclaimer { scroll-margin-top: 100px; }
 @media (max-width: 992px) { #content-disclaimer { scroll-margin-top: 130px; } }
+
+/* ============================================================
+   PHOTO CAROUSEL  (left arrow, right arrow, download - on top of the photo)
+   ============================================================ */
+.photo-carousel { width: 100%; max-width: 900px; margin: 18px auto 28px; }
+.pc-viewport {
+    position: relative; overflow: hidden; border-radius: 12px;
+    background: #f3f1ec; box-shadow: 0 4px 14px rgba(0,0,0,.12);
+    aspect-ratio: 16 / 9;
+    touch-action: pan-y;
+}
+.pc-track { display: flex; height: 100%; transition: transform .45s ease; will-change: transform; }
+.pc-slide { position: relative; flex: 0 0 100%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.pc-slide img { display: block; width: 100%; height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; }
+.pc-slide.missing img { visibility: hidden; }
+.pc-slide.missing::after {
+    content: "Photo not found: " attr(data-missing);
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    padding: 20px; text-align: center; color: #8a7a55; font-size: .9rem; word-break: break-all;
+}
+
+.pc-arrow, .pc-download {
+    position: absolute; z-index: 2; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(30,30,30,.55); color: #fff; border-radius: 50%;
+    transition: background .2s ease, transform .2s ease;
+}
+.pc-arrow { top: 50%; width: 46px; height: 46px; margin-top: -23px; font-size: 1.1rem; }
+.pc-prev { left: 12px; }
+.pc-next { right: 12px; }
+.pc-download { top: 12px; right: 12px; width: 42px; height: 42px; font-size: 1rem; }
+.pc-arrow:hover, .pc-download:hover { background: #c9a961; }
+.pc-arrow:active, .pc-download:active { transform: scale(.94); }
+.pc-arrow:focus-visible, .pc-download:focus-visible { outline: 3px solid #c9a961; outline-offset: 2px; }
+
+@media (max-width: 600px) {
+    .pc-arrow { width: 36px; height: 36px; margin-top: -18px; font-size: .9rem; }
+    .pc-prev { left: 8px; } .pc-next { right: 8px; }
+    .pc-download { width: 36px; height: 36px; top: 8px; right: 8px; font-size: .9rem; }
+}
+
+
+/* PHOTO CAROUSEL: no arrows / download button - small dots below the photo instead */
+.pc-arrow, .pc-download { display: none !important; }
+.pc-viewport { cursor: grab; }
+.pc-viewport:active { cursor: grabbing; }
+.pc-dots { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 12px; }
+.pc-dot {
+    width: 9px; height: 9px; padding: 0; border: none; border-radius: 50%;
+    background: #d9d1bd; cursor: pointer;
+    transition: background .25s ease, width .25s ease;
+}
+.pc-dot:hover { background: #b9a572; }
+.pc-dot.active { width: 24px; border-radius: 6px; background: #c9a961; }
+.pc-dot:focus-visible { outline: 2px solid #c9a961; outline-offset: 3px; }
+
+
+/* PHOTO CAROUSEL: click the photo -> big view (lightbox) */
+.pc-viewport, .pc-viewport:active { cursor: zoom-in; }
+@media (max-width: 768px), (pointer: coarse) { .pc-viewport, .pc-viewport:active { cursor: default; } }   /* phone / tablet: tap does not open the big view */
+
+.pc-lightbox {
+    position: fixed; inset: 0; z-index: 100000;   /* above the "best viewed on desktop" notice (99999) */
+    background: rgba(10,10,10,.92);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s ease;
+}
+.pc-lightbox.open { opacity: 1; visibility: visible; }
+.pcl-stage { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 56px 74px 64px; box-sizing: border-box; }
+.pcl-img {
+    display: block; max-width: 100%; max-height: 100%; object-fit: contain;
+    border-radius: 6px; background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    user-select: none; -webkit-user-drag: none;
+}
+.pcl-missing { display: none; color: #e8dcc0; text-align: center; padding: 20px; word-break: break-all; }
+.pc-lightbox.is-missing .pcl-img { display: none; }
+.pc-lightbox.is-missing .pcl-missing { display: block; }
+
+.pcl-close, .pcl-arrow {
+    position: absolute; z-index: 2; border: none; cursor: pointer; color: #fff;
+    background: rgba(255,255,255,.14); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s ease;
+}
+.pcl-close:hover, .pcl-arrow:hover { background: #c9a961; }
+.pcl-close { top: 14px; right: 14px; width: 44px; height: 44px; font-size: 1.2rem; }
+.pcl-arrow { top: 50%; width: 48px; height: 48px; margin-top: -24px; font-size: 1.1rem; }
+.pcl-prev { left: 14px; }
+.pcl-next { right: 14px; }
+.pcl-close:focus-visible, .pcl-arrow:focus-visible, .pcl-dot:focus-visible { outline: 3px solid #c9a961; outline-offset: 2px; }
+
+.pcl-dots { position: absolute; left: 0; right: 0; bottom: 22px; display: flex; justify-content: center; gap: 9px; }
+.pcl-dot { width: 10px; height: 10px; padding: 0; border: none; border-radius: 50%; background: rgba(255,255,255,.4); cursor: pointer; transition: background .25s ease, width .25s ease; }
+.pcl-dot:hover { background: rgba(255,255,255,.75); }
+.pcl-dot.active { width: 26px; border-radius: 6px; background: #c9a961; }
+
+@media (max-width: 600px) {
+    .pcl-stage { padding: 56px 10px 56px; }
+    .pcl-arrow { width: 38px; height: 38px; margin-top: -19px; font-size: .95rem; background: rgba(0,0,0,.45); }
+    .pcl-prev { left: 6px; } .pcl-next { right: 6px; }
+    .pcl-close { top: 8px; right: 8px; width: 40px; height: 40px; }
+    .pcl-dots { bottom: 18px; }
+}

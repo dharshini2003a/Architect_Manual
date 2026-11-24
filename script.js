@@ -4210,3 +4210,200 @@ document.addEventListener('DOMContentLoaded', function () {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
 })();
+
+/* =====================================================================
+   PHOTO CAROUSEL  (<div class="photo-carousel"> ... </div>)
+   - small dots below the photo (active dot = photo being shown)
+   - click a dot / swipe / drag / keyboard arrows to change the photo
+   - CLICK ON THE PHOTO -> opens it big (lightbox) and you can still go
+     through all the photos there (arrows, dots, swipe, keyboard); Esc / X closes
+   Works for any number of photos and any number of carousels.
+   ===================================================================== */
+(function () {
+    /* ---------- lightbox (one shared popup for all carousels) ---------- */
+    var lb = null;
+    function buildLightbox() {
+        if (lb) return lb;
+        var el = document.createElement('div');
+        el.className = 'pc-lightbox';
+        el.setAttribute('role', 'dialog');
+        el.setAttribute('aria-modal', 'true');
+        el.setAttribute('aria-label', 'Photo viewer');
+        el.innerHTML =
+            '<button type="button" class="pcl-close" aria-label="Close"><i class="fas fa-times"></i></button>' +
+            '<button type="button" class="pcl-arrow pcl-prev" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>' +
+            '<div class="pcl-stage"><img class="pcl-img" alt=""><div class="pcl-missing"></div></div>' +
+            '<button type="button" class="pcl-arrow pcl-next" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>' +
+            '<div class="pcl-dots"></div>';
+        document.body.appendChild(el);
+
+        lb = {
+            el: el,
+            img: el.querySelector('.pcl-img'),
+            miss: el.querySelector('.pcl-missing'),
+            dotsBox: el.querySelector('.pcl-dots'),
+            prev: el.querySelector('.pcl-prev'),
+            next: el.querySelector('.pcl-next'),
+            close: el.querySelector('.pcl-close'),
+            items: [], i: 0, onClose: null, lastFocus: null
+        };
+
+        lb.img.addEventListener('error', function () { lb.miss.textContent = 'Photo not found: ' + lb.img.getAttribute('src'); lb.el.classList.add('is-missing'); });
+        lb.img.addEventListener('load',  function () { lb.el.classList.remove('is-missing'); });
+
+        lb.show = function (k) {
+            var n = lb.items.length;
+            lb.i = (k + n) % n;
+            lb.el.classList.remove('is-missing');
+            lb.img.setAttribute('src', lb.items[lb.i].src);
+            lb.img.setAttribute('alt', lb.items[lb.i].alt || '');
+            var ds = lb.dotsBox.children;
+            for (var j = 0; j < ds.length; j++) ds[j].classList.toggle('active', j === lb.i);
+        };
+        lb.open = function (items, start, onClose) {
+            lb.items = items; lb.onClose = onClose || null;
+            lb.lastFocus = document.activeElement;
+            lb.dotsBox.innerHTML = '';
+            items.forEach(function (it, k) {
+                var d = document.createElement('button');
+                d.type = 'button'; d.className = 'pcl-dot';
+                d.setAttribute('aria-label', 'Show photo ' + (k + 1) + ' of ' + items.length);
+                d.addEventListener('click', function (e) { e.stopPropagation(); lb.show(k); });
+                lb.dotsBox.appendChild(d);
+            });
+            var single = items.length < 2;
+            lb.prev.style.display = lb.next.style.display = lb.dotsBox.style.display = single ? 'none' : '';
+            lb.show(start);
+            lb.el.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            lb.close.focus();
+        };
+        lb.hide = function () {
+            if (!lb.el.classList.contains('open')) return;
+            lb.el.classList.remove('open');
+            document.body.style.overflow = '';
+            var cb = lb.onClose; lb.onClose = null;
+            if (cb) cb(lb.i);
+            if (lb.lastFocus && lb.lastFocus.focus) { try { lb.lastFocus.focus({ preventScroll: true }); } catch (e) {} }
+        };
+
+        lb.prev.addEventListener('click', function (e) { e.stopPropagation(); lb.show(lb.i - 1); });
+        lb.next.addEventListener('click', function (e) { e.stopPropagation(); lb.show(lb.i + 1); });
+        lb.close.addEventListener('click', function (e) { e.stopPropagation(); lb.hide(); });
+        // click on the dark background (not on the photo / buttons) closes
+        el.addEventListener('click', function (e) { if (e.target === el || e.target.classList.contains('pcl-stage')) lb.hide(); });
+
+        document.addEventListener('keydown', function (e) {
+            if (!lb.el.classList.contains('open')) return;
+            if (e.key === 'Escape')     { lb.hide(); }
+            if (e.key === 'ArrowLeft')  { lb.show(lb.i - 1); e.preventDefault(); }
+            if (e.key === 'ArrowRight') { lb.show(lb.i + 1); e.preventDefault(); }
+        });
+
+        // swipe inside the lightbox
+        var x0 = null, y0 = null;
+        el.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+        el.addEventListener('touchend', function (e) {
+            if (x0 === null) return;
+            var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) lb.show(dx < 0 ? lb.i + 1 : lb.i - 1);
+            x0 = y0 = null;
+        }, { passive: true });
+
+        return lb;
+    }
+
+    /* ---------- one carousel ---------- */
+    function initCarousel(root) {
+        var track  = root.querySelector('.pc-track');
+        var slides = root.querySelectorAll('.pc-slide');
+        var view   = root.querySelector('.pc-viewport');
+        if (!track || !slides.length || !view) return;
+        var i = 0, n = slides.length, suppressClick = false;
+
+        // arrows / download button are not used any more - remove them if they are still in the HTML
+        root.querySelectorAll('.pc-arrow, .pc-download').forEach(function (b) { b.parentNode.removeChild(b); });
+
+        // if a photo file is not found, show which file name is missing
+        slides.forEach(function (s) {
+            var img = s.querySelector('img');
+            if (!img) return;
+            img.addEventListener('error', function () { s.classList.add('missing'); s.setAttribute('data-missing', img.getAttribute('src')); });
+        });
+
+        // dots
+        var dotsBox = root.querySelector('.pc-dots');
+        if (!dotsBox) { dotsBox = document.createElement('div'); dotsBox.className = 'pc-dots'; root.appendChild(dotsBox); }
+        dotsBox.innerHTML = '';
+        var dots = [];
+        for (var k = 0; k < n; k++) {
+            (function (k) {
+                var d = document.createElement('button');
+                d.type = 'button';
+                d.className = 'pc-dot';
+                d.setAttribute('aria-label', 'Show photo ' + (k + 1) + ' of ' + n);
+                d.addEventListener('click', function () { go(k); });
+                dotsBox.appendChild(d);
+                dots.push(d);
+            })(k);
+        }
+        if (n < 2) dotsBox.style.display = 'none';
+
+        function go(k) {
+            i = (k + n) % n;                                   // loops: after the last photo -> first
+            track.style.transform = 'translateX(' + (-100 * i) + '%)';
+            dots.forEach(function (d, j) {
+                d.classList.toggle('active', j === i);
+                if (j === i) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+            });
+        }
+        go(0);
+
+        // swipe (phones / tablets)
+        var x0 = null, y0 = null;
+        view.addEventListener('touchstart', function (e) { suppressClick = false; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+        view.addEventListener('touchend', function (e) {
+            if (x0 === null) return;
+            var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { suppressClick = true; go(dx < 0 ? i + 1 : i - 1); }
+            x0 = y0 = null;
+        }, { passive: true });
+
+        // mouse drag (desktop)
+        var mx = null;
+        view.addEventListener('mousedown', function (e) { suppressClick = false; mx = e.clientX; });
+        window.addEventListener('mouseup', function (e) {
+            if (mx === null) return;
+            var dx = e.clientX - mx; mx = null;
+            if (Math.abs(dx) > 50) { suppressClick = true; go(dx < 0 ? i + 1 : i - 1); }
+            else if (Math.abs(dx) > 6) { suppressClick = true; }
+        });
+        view.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+        // CLICK on the photo -> open big, in carousel format
+        view.addEventListener('click', function () {
+            if (suppressClick) { suppressClick = false; return; }
+            // phone / tablet view (touch or narrow screen): tapping the photo does NOT open the big view
+            if (window.matchMedia('(max-width: 768px), (pointer: coarse)').matches) return;
+            var items = [];
+            slides.forEach(function (s) {
+                var img = s.querySelector('img');
+                items.push({ src: img ? img.getAttribute('src') : '', alt: img ? img.getAttribute('alt') : '' });
+            });
+            buildLightbox().open(items, i, function (last) { go(last); });   // when closed, the small carousel shows the same photo
+        });
+        view.setAttribute('title', 'Click to enlarge');
+
+        // keyboard arrows while the carousel has focus
+        root.setAttribute('tabindex', '0');
+        root.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft')  { go(i - 1); e.preventDefault(); }
+            if (e.key === 'ArrowRight') { go(i + 1); e.preventDefault(); }
+            if (e.key === 'Enter' && e.target === root) { view.click(); }
+        });
+    }
+
+    function initAll() { document.querySelectorAll('.photo-carousel').forEach(initCarousel); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
+    else initAll();
+})();
