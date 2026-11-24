@@ -4407,3 +4407,61 @@ document.addEventListener('DOMContentLoaded', function () {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
     else initAll();
 })();
+
+/* =====================================================================
+   POPUP WINDOW FOR A PAGE   (<a class="popup-link" href="page.html" data-popup-title="Title">)
+   Click -> the page opens in a window on top of the chapter (the chapter stays where it was).
+   Close with the X, the Esc key, or by clicking the dark background.
+   (If JavaScript is off, or with ctrl/middle-click, the link simply opens the page normally.)
+   ===================================================================== */
+(function () {
+    var ov = null, frame = null, titleEl = null, lastFocus = null;
+
+    function build() {
+        if (ov) return;
+        ov = document.createElement('div');
+        ov.className = 'pf-overlay';
+        ov.setAttribute('role', 'dialog');
+        ov.setAttribute('aria-modal', 'true');
+        ov.innerHTML =
+            '<div class="pf-panel">' +
+                '<div class="pf-head"><h3 class="pf-title"></h3>' +
+                '<button type="button" class="pf-close" aria-label="Close">&times;</button></div>' +
+                '<iframe class="pf-frame" title="Checklist"></iframe>' +
+            '</div>';
+        document.body.appendChild(ov);
+        frame   = ov.querySelector('.pf-frame');
+        titleEl = ov.querySelector('.pf-title');
+        ov.querySelector('.pf-close').addEventListener('click', close);
+        // Esc also works while the cursor is inside the page shown in the window (only possible when both pages are on the same site / server)
+        frame.addEventListener('load', function () {
+            try { frame.contentWindow.document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); }); } catch (err) { /* opened from a local folder: the X button / background click / Esc (outside the form) still close it */ }
+        });
+        ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ov.classList.contains('open')) close(); });
+    }
+    function open(href, title) {
+        build();
+        lastFocus = document.activeElement;
+        titleEl.textContent = title || '';
+        frame.setAttribute('title', title || 'Page');
+        frame.src = href;
+        ov.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        ov.querySelector('.pf-close').focus();
+    }
+    function close() {
+        if (!ov) return;
+        ov.classList.remove('open');
+        document.body.style.overflow = '';
+        frame.src = 'about:blank';
+        if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
+    }
+
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a.popup-link');
+        if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
+        e.preventDefault();
+        open(a.getAttribute('href'), a.getAttribute('data-popup-title') || a.textContent.trim());
+    });
+})();

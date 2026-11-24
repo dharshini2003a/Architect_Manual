@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive Chapter 5 checklist for scoping architectural services for layout design.">
+  <title>Chapter 5 Checklist | Scoping the Services for Layout Design</title>
+  <style>
+    :root { --teal:#d8893e; --teal-light:#fce4d6; --ink:#263238; --muted:#626262; --accent:#f6b26b; --accent-light:#fce4d6; --gold:#ffd965; --blue:#2f5496; --line:#dedede; --paper:#fff; --bg:#fff; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--bg); font:16px/1.5 "Segoe UI",Arial,sans-serif; }
+    .shell { max-width:900px; margin:0 auto; padding:22px 20px 38px; }
+    header { background:#fff; color:var(--ink); padding:8px 0 18px; border-bottom:4px solid var(--accent); }
+    .eyebrow { text-transform:uppercase; letter-spacing:.08em; color:#8a5a24; font-size:.76rem; font-weight:700; }
+    h1 { margin:6px 0; color:var(--blue); font-size:clamp(1.55rem,4vw,2rem); line-height:1.2; }
+    header p { max-width:720px; margin:0; color:var(--muted); }
+    .meta, .card { background:var(--paper); border:1px solid var(--line); border-radius:8px; }
+    .meta { margin:16px 0; padding:16px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; background:#fffaf4; }
+    .card { margin:10px 0; padding:16px; }
+    .card h2 { margin:0 0 10px; padding-bottom:8px; border-bottom:2px solid var(--accent-light); color:var(--blue); font-size:1.08rem; display:flex; align-items:flex-start; gap:9px; }
+    .num { display:inline-grid; place-items:center; flex:0 0 26px; height:26px; background:var(--gold); color:#4b3b20; border-radius:50%; font-size:.86rem; }
+    .field { min-width:0; }
+    label, .label { display:block; font-weight:650; margin:0 0 6px; }
+    .hint { color:var(--muted); font-size:.88rem; margin:2px 0 10px; }
+    input[type="text"], input[type="date"], textarea, select { width:100%; border:1px solid #c9c9c9; border-radius:6px; padding:9px 10px; color:var(--ink); background:white; font:inherit; }
+    textarea { min-height:82px; resize:vertical; }
+    input:focus, textarea:focus, select:focus { outline:3px solid #f6b26b55; border-color:#d8893e; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .question { padding:13px 0; border-top:1px solid #edf1f0; }
+    .question:first-of-type { border-top:0; }
+    .question-title { font-weight:600; margin-bottom:9px; }
+    .answer { display:grid; grid-template-columns:minmax(140px,.55fr) minmax(0,1.45fr); gap:12px; align-items:start; }
+    .sub { margin:10px 0 0 16px; padding-left:14px; border-left:3px solid var(--teal-light); }
+    .checks { display:flex; flex-wrap:wrap; gap:10px 18px; }
+    .checks label { display:inline-flex; align-items:center; gap:7px; font-weight:500; margin:0; }
+    input[type="checkbox"] { accent-color:var(--teal); width:17px; height:17px; }
+    .actions { display:flex; justify-content:flex-end; gap:10px; margin:16px 0 0; padding:10px 0; border-top:1px solid var(--line); }
+    button { border:0; border-radius:6px; padding:10px 15px; font-family:inherit; font-weight:650; cursor:pointer; }
+    .primary { background:var(--accent); color:#30261b; }
+    .secondary { background:#f1f1f1; color:var(--ink); }
+    .primary:hover { background:#eea24f; }
+    .status { align-self:center; color:var(--muted); font-size:.9rem; margin-right:auto; }
+    .required-note { color:var(--muted); font-size:.86rem; margin:12px 2px; }
+    @media(max-width:650px) { .shell{padding:16px 12px 42px}.meta,.grid{grid-template-columns:1fr}.card{padding:17px}.answer{grid-template-columns:1fr;gap:8px}.actions{bottom:6px} }
+    @media print {
+      @page { size:A4; margin:14mm 13mm; }
+      body { background:white; font-size:10pt; color:#222; }
+      .shell { max-width:none; padding:0; }
+      header { padding:0 0 10px; border-radius:0; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+      header h1 { font-size:20pt; }
+      .meta,.card { border-color:#c9c9c9; border-radius:3px; }
+      .meta { margin:9px 0; padding:10px; gap:8px; }
+      .card { margin:7px 0; padding:10px; break-inside:auto; page-break-inside:auto; }
+      .card h2 { font-size:12pt; }
+      input[type="text"], input[type="date"], textarea, select { border-color:#aaa; color:#222; padding:5px; }
+      textarea { min-height:50px; }
+      .actions,.screen-only { display:none !important; }
+      .question { break-inside:auto; page-break-inside:auto; }
+      .card h2 { break-after:avoid; page-break-after:avoid; }
+      a { color:inherit; text-decoration:none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="eyebrow">Standardised Architectural Modules · Chapter 5</div>
+      <h1>Scoping the Services for Layout Design</h1>
+      <p>Complete the checklist for the proposed facility. Add notes where a service is planned, optional, or needs a later decision. Use “Download PDF” to print or save a completed copy.</p>
+    </header>
+
+    <section class="meta" aria-label="Project details">
+      <div class="field"><label for="project">Project / facility name</label><input id="project" type="text" autocomplete="organization"></div>
+      <div class="field"><label for="location">Location</label><input id="location" type="text" autocomplete="address-level2"></div>
+      <div class="field"><label for="prepared">Prepared by</label><input id="prepared" type="text" autocomplete="name"></div>
+      <div class="field"><label for="date">Date</label><input id="date" type="date"></div>
+    </section>
+
+    <p class="required-note">For each Yes / No item, choose “Not decided” if the scope is still under discussion. Follow-up fields appear when relevant.</p>
+
+    <form id="checklist" autocomplete="on">
+      <section class="card">
+        <h2><span class="num">1</span>General administration</h2>
+        <div class="answer"><div class="field"><label for="admin-plan">Is general administration included in the facility scope?</label><select id="admin-plan"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="admin-notes">Remarks &amp; details</label><textarea id="admin-notes"></textarea></div></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">2</span>Outpatient care</h2>
+        <div class="question"><div class="question-title">Which outpatient service categories are planned?</div><div class="checks"><label><input type="checkbox" name="op-category"> Paying</label><label><input type="checkbox" name="op-category"> Subsidised</label><label><input type="checkbox" name="op-category"> Free</label></div>
+          <div class="sub"><label for="segregation">If more than one category is selected, will services be segregated?</label><select id="segregation"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select><label for="segregation-details" style="margin-top:9px">Segregation details</label><textarea id="segregation-details"></textarea></div>
+        </div>
+        <div class="question"><div class="question-title">Which OP service arrangement is planned?</div><div class="checks"><label><input type="radio" name="op-arrangement" value="general"> General clinic only</label><label><input type="radio" name="op-arrangement" value="speciality"> General clinic and separate speciality clinics</label></div>
+          <div class="sub"><label for="specialities">If separate speciality clinics are planned, list them</label><textarea id="specialities" placeholder="1.&#10;2.&#10;3."></textarea></div>
+          <label for="op-notes" style="margin-top:10px">Remarks &amp; details</label><textarea id="op-notes" placeholder="For example, a separate investigation area or services planned for a later stage."></textarea>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">3</span>Optical shop <span class="hint">(desirable)</span></h2>
+        <div class="grid"><div class="field"><label for="optical">Are you planning an optical shop?</label><select id="optical"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="optical-count">If yes, outlet plan</label><select id="optical-count"><option value="">Select…</option><option>Single outlet</option><option>Multiple outlets</option></select></div></div>
+        <div class="field" style="margin-top:12px"><label for="optical-locations">Locations (list each if multiple)</label><textarea id="optical-locations" placeholder="1.&#10;2.&#10;3."></textarea></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">4</span>Medical shop <span class="hint">(desirable)</span></h2>
+        <div class="grid"><div class="field"><label for="medical">Are you planning a medical shop?</label><select id="medical"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="medical-count">If yes, outlet plan</label><select id="medical-count"><option value="">Select…</option><option>Single outlet</option><option>Multiple outlets</option></select></div></div>
+        <div class="field" style="margin-top:12px"><label for="medical-locations">Locations (list each if multiple)</label><textarea id="medical-locations" placeholder="1.&#10;2.&#10;3."></textarea></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">5</span>Operation Theatre (OT) provisions</h2>
+        <p class="hint">For each provision, indicate whether it is planned and, if yes, whether it will be within the OT complex. If it will be elsewhere, note the likely location.</p>
+        <div class="question"><div class="question-title">Day care (ambulatory) ward</div><div class="answer"><div class="field"><label for="ot-daycare">Planned?</label><select id="ot-daycare"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="ot-daycare-complex">Within OT complex?</label><select id="ot-daycare-complex"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select><input id="ot-daycare-location" type="text" placeholder="Likely location if outside the OT complex" style="margin-top:8px"></div></div></div>
+        <div class="question"><div class="question-title">Septic OT</div><div class="answer"><div class="field"><label for="ot-septic">Planned?</label><select id="ot-septic"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="ot-septic-complex">Within OT complex?</label><select id="ot-septic-complex"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select><input id="ot-septic-location" type="text" placeholder="Likely location if outside the OT complex" style="margin-top:8px"></div></div></div>
+        <div class="question"><div class="question-title">LASIK OT</div><div class="answer"><div class="field"><label for="ot-lasik">Planned?</label><select id="ot-lasik"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="ot-lasik-complex">Within OT complex?</label><select id="ot-lasik-complex"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select><input id="ot-lasik-location" type="text" placeholder="Likely location if outside the OT complex" style="margin-top:8px"></div></div></div>
+        <div class="question"><div class="question-title">Intravitreal injections</div><div class="answer"><div class="field"><label for="ot-injection">Planned?</label><select id="ot-injection"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="ot-injection-complex">Within OT complex?</label><select id="ot-injection-complex"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select><input id="ot-injection-location" type="text" placeholder="Likely location if outside the OT complex" style="margin-top:8px"></div></div></div>
+        <div class="field" style="margin-top:12px"><label for="ot-other">Other OT provisions / remarks</label><textarea id="ot-other"></textarea></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">6</span>Overnight admission (IP services)</h2>
+        <div class="grid"><div class="field"><label for="ip-admission">Do you plan to admit patients overnight?</label><select id="ip-admission"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><span class="label">Separate wards / beds planned for</span><div class="checks"><label><input type="checkbox" name="ip-ward"> Paying</label><label><input type="checkbox" name="ip-ward"> Free / subsidised</label></div></div></div>
+        <div class="field" style="margin-top:12px"><label for="ip-notes">Remarks &amp; details</label><textarea id="ip-notes"></textarea></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">7</span>Clinical support functions</h2>
+        <p class="hint">Select the functions planned for the facility.</p>
+        <div class="checks"><label><input type="checkbox" name="clinical-support"> Eye banking</label><label><input type="checkbox" name="clinical-support"> Physician clinic</label><label><input type="checkbox" name="clinical-support"> Radiology (X-Ray)</label><label><input type="checkbox" name="clinical-support"> Laboratory</label><label><input type="checkbox" name="clinical-support"> Other</label></div>
+        <div class="field" style="margin-top:12px"><label for="clinical-other">Other function / details</label><textarea id="clinical-other"></textarea></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">8</span>Non-clinical support services (in-house)</h2>
+        <p class="hint">Select the services planned in-house.</p>
+        <div class="checks"><label><input type="checkbox" name="nonclinical"> Facility maintenance</label><label><input type="checkbox" name="nonclinical"> Instruments maintenance</label><label><input type="checkbox" name="nonclinical"> Waste management</label><label><input type="checkbox" name="nonclinical"> Water Treatment Plant</label><label><input type="checkbox" name="nonclinical"> Power Generator</label><label><input type="checkbox" name="nonclinical"> Solar Panels</label><label><input type="checkbox" name="nonclinical"> Other</label></div>
+        <div class="grid" style="margin-top:12px"><div class="field"><label for="generator-kva">If a power generator is planned, capacity (kVA)</label><input id="generator-kva" type="text"></div><div class="field"><label for="nonclinical-other">Other service / remarks</label><input id="nonclinical-other" type="text"></div></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">9</span>Teaching &amp; training</h2>
+        <div class="answer"><div class="field"><label for="teaching">Is teaching and training planned?</label><select id="teaching"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="teaching-notes">Remarks &amp; details</label><textarea id="teaching-notes"></textarea></div></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">10</span>Research initiative</h2>
+        <div class="answer"><div class="field"><label for="research">Is a research initiative planned?</label><select id="research"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="research-notes">Remarks &amp; details</label><textarea id="research-notes"></textarea></div></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">11</span>Staff accommodation / guest house</h2>
+        <div class="answer"><div class="field"><label for="accommodation">Is staff accommodation or a guest house planned?</label><select id="accommodation"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div><div class="field"><label for="accommodation-notes">If yes, provide some details</label><textarea id="accommodation-notes"></textarea></div></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">12</span>Parking</h2>
+        <div class="question"><div class="question-title">Will there be parking at the facility?</div><select id="parking"><option value="">Select…</option><option>Yes</option><option>No</option><option>Not decided</option></select></div>
+        <div class="question"><div class="question-title">If yes, will there be separate parking for</div><div class="checks"><label><input type="checkbox" name="parking-separate"> Staff</label><label><input type="checkbox" name="parking-separate"> Patients</label></div></div>
+        <div class="field"><label for="parking-notes">Remarks &amp; details</label><textarea id="parking-notes"></textarea></div>
+      </section>
+    </form>
+
+    <div class="actions screen-only">
+      <span class="status" id="status" role="status" aria-live="polite">Your answers stay in this browser until you close or refresh this page.</span>
+      <button class="secondary" type="button" id="clear">Clear form</button>
+      <button class="primary" type="button" id="download">Download PDF</button>
+    </div>
+  </main>
+  <script>
+    // Persist answers only in this browser to avoid losing work before printing.
+    // Nothing is uploaded or sent to the site.
+    (() => {
+      const form = document.getElementById('checklist');
+      const fields = [...document.querySelectorAll('input, textarea, select')];
+      const storageKey = 'chapter5-scoping-checklist-v1';
+      const restore = () => {
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+          fields.forEach((el, i) => {
+            const value = saved[i];
+            if (value === undefined) return;
+            if (el.type === 'checkbox' || el.type === 'radio') el.checked = value;
+            else el.value = value;
+          });
+        } catch (_) { /* storage may be disabled */ }
+      };
+      const save = () => {
+        try {
+          const values = fields.map(el => (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value);
+          localStorage.setItem(storageKey, JSON.stringify(values));
+          document.getElementById('status').textContent = 'Draft saved in this browser only. Nothing has been uploaded.';
+        } catch (_) {
+          document.getElementById('status').textContent = 'Answers are on this page only; browser storage is unavailable.';
+        }
+      };
+      restore();
+      form.addEventListener('input', save);
+      form.addEventListener('change', save);
+      document.querySelector('.meta').addEventListener('input', save);
+      document.querySelector('.meta').addEventListener('change', save);
+      document.getElementById('download').addEventListener('click', () => window.print());
+      document.getElementById('clear').addEventListener('click', () => {
+        if (!window.confirm('Clear all checklist answers saved in this browser?')) return;
+        form.reset();
+        document.querySelectorAll('.meta input').forEach(el => { el.value = ''; });
+        try { localStorage.removeItem(storageKey); } catch (_) { }
+        document.getElementById('status').textContent = 'Form cleared.';
+      });
+    })();
+  </script>
+</body>
+</html>
